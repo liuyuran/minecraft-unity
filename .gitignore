@@ -15,8 +15,6 @@
 .collabignore
 **/Assets/AddressableAssetsData/*/*.bin*
 **/assets/addressableassetsdata/*/*.bin*
-**/Assets/StreamingAssets/aa.meta
-**/assets/streamingassets/*/aa/*
 
 # Unity3D generated PlasticSCM flies
 /Assets/Plugins/PlasticSCM*
@@ -74,3 +72,4 @@ crashlytics-build.properties
 # Windows files
 Thumbs.db
 Desktop.ini
+*.meta
