@@ -1,4 +1,5 @@
-﻿using Unity.Entities;
+﻿using Components.Tags;
+using Unity.Entities;
 using UnityEngine;
 
 namespace Components {
@@ -14,6 +15,7 @@ namespace Components {
                 AddComponent(entity, new BlockGenerator {
                     ProtoType = GetEntity(authoring.cubePrefab, TransformUsageFlags.None)
                 });
+                AddComponent(entity, new NeedSetTexture());
             }
         }
     }

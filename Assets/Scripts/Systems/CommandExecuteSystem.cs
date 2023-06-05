@@ -8,11 +8,9 @@ using UnityEngine;
 
 namespace Systems {
     public partial struct CommandExecuteSystem: ISystem {
-        private static readonly int Texture2D1 = Shader.PropertyToID("_Texture2D");
 
         public void OnCreate(ref SystemState state) {
             state.RequireForUpdate<BlockGenerator>();
-            //
         }
 
         public void OnDestroy(ref SystemState state) {
@@ -28,8 +26,6 @@ namespace Systems {
                 var position = new float3(0, 0, 0);
                 var transform = SystemAPI.GetComponentRW<LocalTransform>(cube);
                 transform.ValueRW.Position = position;
-                // var meshRenderer = SystemAPI.GetComponentRW<MeshRenderer>(cube);
-                // meshRenderer.ValueRW.material.SetTexture(Texture2D1, BlockTypeManager.Instance.GetMergedTexture());
             }
 
             state.Enabled = false;
