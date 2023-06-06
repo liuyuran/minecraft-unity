@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using Blocks;
+using Base.Blocks;
 using Exceptions;
 using UnityEngine;
 using UnityEngine.Windows;
@@ -35,7 +35,7 @@ namespace Managers {
         /// <exception cref="DuplicateBlockIdException">当重复注册同一个id时抛出此异常</exception>
         /// <exception cref="TextureLoadFailedException">方块贴图载入失败时抛出此异常</exception>
         /// <exception cref="BlockRegistryForbiddenException">游戏启动后注册方块会抛出此异常</exception>
-        private void RegisterBlock(Block obj) {
+        private void RegisterBlock(IBlock obj) {
             if (_locked) throw new BlockRegistryForbiddenException("出于性能考虑，游戏启动后禁止注册方块");
             var numId = _idGenerator++;
             var blockId = obj.ID;
