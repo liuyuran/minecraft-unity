@@ -1,11 +1,11 @@
-﻿using Unity.Collections;
+﻿using Unity.Burst;
 using Unity.Entities;
 using Unity.Jobs;
 using Unity.Mathematics;
 using Unity.Transforms;
 
 namespace Systems.Jobs {
-    [GenerateTestsForBurstCompatibility]
+    [BurstCompile]
     public struct BlockGenerateJob : IJobParallelFor {
         public Entity Prototype;
         public EntityCommandBuffer.ParallelWriter Ecb;
