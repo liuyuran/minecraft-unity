@@ -1,7 +1,8 @@
 ﻿using Components;
-using Managers;
+using Systems.Jobs;
 using Unity.Collections;
 using Unity.Entities;
+using Unity.Jobs;
 using Unity.Mathematics;
 using Unity.Rendering;
 using Unity.Transforms;
@@ -12,7 +13,6 @@ using UnityEngine.Windows;
 namespace Systems {
     public partial struct CommandExecuteSystem : ISystem {
         public void OnCreate(ref SystemState state) {
-            state.RequireForUpdate<BlockGenerator>();
         }
 
         public void OnDestroy(ref SystemState state) {
@@ -20,17 +20,13 @@ namespace Systems {
         }
 
         public void OnUpdate(ref SystemState state) {
+            Debug.Log("render");
             var entityManager = state.EntityManager;
-            if (!SystemAPI.HasSingleton<BlockGenerator>()) {
-                return;
-            }
-            var generator = SystemAPI.GetSingleton<BlockGenerator>();
+            var ecb = new EntityCommandBuffer(Allocator.TempJob);
             var cubes = CollectionHelper.CreateNativeArray<Entity>(1, Allocator.Temp);
-            entityManager.Instantiate(generator.ProtoType, cubes);
+            cubes[0] = entityManager.CreateEntity();
             foreach (var cube in cubes) {
                 var position = new float3(2, 2, 2);
-                var transform = SystemAPI.GetComponentRW<LocalTransform>(cube);
-                transform.ValueRW.Position = position;
                 entityManager.AddComponentData(cube, new LocalToWorld {
                     Value = float4x4.Translate(position)
                 });
@@ -96,7 +92,14 @@ namespace Systems {
                     desc,
                     renderMeshArray,
                     MaterialMeshInfo.FromRenderMeshArrayIndices(0, 0));
+                // var job = new BlockGenerateJob();
+                // var task = job.Schedule(1, 128);
+                // task.Complete();
             }
+            
+            ecb.Playback(entityManager);
+            ecb.Dispose();
+            // entityManager.DestroyEntity(cubes[0]);
 
             state.Enabled = false;
         }
