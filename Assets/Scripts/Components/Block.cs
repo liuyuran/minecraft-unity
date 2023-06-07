@@ -1,7 +1,4 @@
-﻿using System;
-using Unity.Entities;
-using Unity.Rendering;
-using UnityEngine;
+﻿using Unity.Entities;
 
 namespace Components {
     public struct Block: IComponentData {
