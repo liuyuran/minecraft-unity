@@ -1,4 +1,5 @@
 ﻿using Unity.Burst;
+using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
 using Unity.Mathematics;
@@ -9,12 +10,12 @@ namespace Systems.Jobs {
     public struct BlockGenerateJob : IJobParallelFor {
         public Entity Prototype;
         public EntityCommandBuffer.ParallelWriter Ecb;
-        public float3 Pos;
+        [ReadOnly] public NativeArray<float3> Pos;
 
         public void Execute(int index) {
             var e = Ecb.Instantiate(index, Prototype);
             Ecb.SetComponent(index, e, new LocalToWorld {
-                Value = float4x4.Translate(Pos)
+                Value = float4x4.Translate(Pos[index])
             });
         }
     }
