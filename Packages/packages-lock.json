@@ -240,12 +240,6 @@
       },
       "url": "https://packages.unity.com"
     },
-    "site.chaotic-quantum.minecraft-base": {
-      "version": "file:../../minecraft-base",
-      "depth": 0,
-      "source": "local",
-      "dependencies": {}
-    },
     "com.unity.modules.ai": {
       "version": "1.0.0",
       "depth": 0,

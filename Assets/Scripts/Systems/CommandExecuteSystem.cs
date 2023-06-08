@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Managers;
 using Systems.Jobs;
 using Unity.Collections;
@@ -103,6 +102,9 @@ namespace Systems {
             var cube = entityManager.CreateEntity();
             var mesh = GenerateBlockMesh();
             const string blockId = "classic:air";
+            var material = new Material(Shader.Find("Universal Render Pipeline/Lit")) {
+                mainTexture = BlockTypeManager.Instance.GetMergedTexture()
+            };
             var uvs = new List<Vector2>();
             uvs.AddRange(BlockTypeManager.Instance.GetBlockTexture(blockId, Direction.south));
             uvs.AddRange(BlockTypeManager.Instance.GetBlockTexture(blockId, Direction.north));
@@ -116,9 +118,6 @@ namespace Systems {
             var desc = new RenderMeshDescription(
                 shadowCastingMode: ShadowCastingMode.Off,
                 receiveShadows: false);
-            var material = new Material(Shader.Find("Universal Render Pipeline/Lit")) {
-                mainTexture = BlockTypeManager.Instance.GetMergedTexture()
-            };
             var renderMeshArray = new RenderMeshArray(
                 new[] { material },
                 new[] { mesh }

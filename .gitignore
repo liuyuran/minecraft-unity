@@ -84,3 +84,4 @@ InitTestScene*.unity
 !/[Aa]ssets/**/*.meta
 
 Assets/SceneDependencyCache/
+Assets/Scripts/PreCompile/
