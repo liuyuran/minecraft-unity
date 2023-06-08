@@ -1,7 +1,5 @@
-﻿using System.Collections.Generic;
-using Base;
-using Base.Const;
-using Base.Manager;
+﻿using System;
+using System.Collections.Generic;
 using Managers;
 using Systems.Jobs;
 using Unity.Collections;
@@ -11,14 +9,13 @@ using Unity.Mathematics;
 using Unity.Rendering;
 using UnityEngine;
 using UnityEngine.Rendering;
-using UnityEngine.Windows;
+using Utils;
 using Entity = Unity.Entities.Entity;
 using EntityManager = Unity.Entities.EntityManager;
 
 namespace Systems {
     public partial struct CommandExecuteSystem : ISystem {
-        public void OnCreate(ref SystemState state) {
-        }
+        public void OnCreate(ref SystemState state) { }
 
         public void OnDestroy(ref SystemState state) {
             //
@@ -44,63 +41,88 @@ namespace Systems {
             state.Enabled = false;
         }
 
-        private Entity GetBlockPrototype(EntityManager entityManager) {
-            var cube = entityManager.CreateEntity();
+        private Mesh GenerateBlockMesh() {
             var mesh = new Mesh {
                 vertices = new Vector3[] {
+                    // front face
                     new(0, 0, 0),
                     new(0, 1, 0),
                     new(1, 1, 0),
                     new(1, 0, 0),
+                    // back face
+                    new(1, 0, 1),
+                    new(1, 1, 1),
+                    new(0, 1, 1),
                     new(0, 0, 1),
+                    // top face
+                    new(0, 1, 0),
                     new(0, 1, 1),
                     new(1, 1, 1),
-                    new(1, 0, 1)
-                },
-                triangles = new[] {
-                    // front face
-                    0, 1, 2,
-                    2, 3, 0,
-                    // top face
-                    1, 5, 6,
-                    6, 2, 1,
-                    // back face
-                    7, 6, 5,
-                    5, 4, 7,
+                    new(1, 1, 0),
                     // bottom face
-                    4, 0, 3,
-                    3, 7, 4,
+                    new(0, 0, 1),
+                    new(0, 0, 0),
+                    new(1, 0, 0),
+                    new(1, 0, 1),
                     // left face
-                    4, 5, 1,
-                    1, 0, 4,
+                    new(0, 0, 1),
+                    new(0, 1, 1),
+                    new(0, 1, 0),
+                    new(0, 0, 0),
                     // right face
-                    3, 2, 6,
-                    6, 7, 3
+                    new(1, 0, 0),
+                    new(1, 1, 0),
+                    new(1, 1, 1),
+                    new(1, 0, 1)
                 }
             };
-            var uvs = new Vector2[mesh.vertices.Length];
-            for (var i = 0; i < uvs.Length; i++) {
-                uvs[i] = new Vector2(mesh.vertices[i].x, mesh.vertices[i].y);
-            }
+            mesh.triangles = new[] {
+                // front face
+                0, 1, 2,
+                2, 3, 0,
+                // back face
+                4, 5, 6,
+                6, 7, 4,
+                // top face
+                8, 9, 10,
+                10, 11, 8,
+                // bottom face
+                12, 13, 14,
+                14, 15, 12,
+                // left face
+                16, 17, 18,
+                18, 19, 16,
+                // right face
+                20, 21, 22,
+                22, 23, 20
+            };
+            return mesh;
+        }
 
-            mesh.SetUVs(0, uvs);
+        private Entity GetBlockPrototype(EntityManager entityManager) {
+            var cube = entityManager.CreateEntity();
+            var mesh = GenerateBlockMesh();
+            const string blockId = "classic:air";
+            var uvs = new List<Vector2>();
+            uvs.AddRange(BlockTypeManager.Instance.GetBlockTexture(blockId, Direction.south));
+            uvs.AddRange(BlockTypeManager.Instance.GetBlockTexture(blockId, Direction.north));
+            uvs.AddRange(BlockTypeManager.Instance.GetBlockTexture(blockId, Direction.up));
+            uvs.AddRange(BlockTypeManager.Instance.GetBlockTexture(blockId, Direction.down));
+            uvs.AddRange(BlockTypeManager.Instance.GetBlockTexture(blockId, Direction.west));
+            uvs.AddRange(BlockTypeManager.Instance.GetBlockTexture(blockId, Direction.east));
+
+            mesh.SetUVs(0, uvs.ToArray());
             mesh.RecalculateNormals();
             var desc = new RenderMeshDescription(
                 shadowCastingMode: ShadowCastingMode.Off,
                 receiveShadows: false);
-            var byteArray = File.ReadAllBytes($"{Application.dataPath}/Texture/texture.jpg");
-            var texture = new Texture2D(32,32);
-            var isLoaded = texture.LoadImage(byteArray);
             var material = new Material(Shader.Find("Universal Render Pipeline/Lit")) {
-                mainTexture = texture
+                mainTexture = BlockTypeManager.Instance.GetMergedTexture()
             };
-            // Create an array of mesh and material required for runtime rendering.
             var renderMeshArray = new RenderMeshArray(
                 new[] { material },
                 new[] { mesh }
             );
-            // Call AddComponents to populate base entity with the components required
-            // by Entities Graphics
             RenderMeshUtility.AddComponents(
                 cube,
                 entityManager,
