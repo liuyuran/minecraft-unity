@@ -24,7 +24,7 @@ namespace Systems {
     public partial struct CommandExecuteSystem : ISystem {
         public void OnCreate(ref SystemState state) {
             new Thread(() => { Game.Start(""); }).Start();
-            Thread.Sleep(100);
+            Thread.Sleep(1000);
             CommandTransferManager.NetworkAdapter?.JoinGame("Kamoeth");
         }
 

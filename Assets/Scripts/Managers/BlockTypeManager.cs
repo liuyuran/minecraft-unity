@@ -113,16 +113,16 @@ namespace Managers {
                     uvs[3] = new Vector2(0.666f, 0.5f);
                     break;
                 case Direction.up:
-                    uvs[0] = new Vector2(0.334f, 0.5f);
-                    uvs[1] = new Vector2(0.666f, 0.5f);
-                    uvs[3] = new Vector2(0.334f, 0.0f);
-                    uvs[2] = new Vector2(0.666f, 0.0f);
+                    uvs[1] = new Vector2(0.334f, 0.5f);
+                    uvs[2] = new Vector2(0.666f, 0.5f);
+                    uvs[0] = new Vector2(0.334f, 0.0f);
+                    uvs[3] = new Vector2(0.666f, 0.0f);
                     break;
                 case Direction.down:
-                    uvs[3] = new Vector2(0.0f, 0.5f);
-                    uvs[0] = new Vector2(0.0f, 1.0f);
-                    uvs[1] = new Vector2(0.333f, 1.0f);
-                    uvs[2] = new Vector2(0.333f, 0.5f);
+                    uvs[0] = new Vector2(0.0f, 0.5f);
+                    uvs[1] = new Vector2(0.0f, 1.0f);
+                    uvs[2] = new Vector2(0.333f, 1.0f);
+                    uvs[3] = new Vector2(0.333f, 0.5f);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(direction), direction, null);
