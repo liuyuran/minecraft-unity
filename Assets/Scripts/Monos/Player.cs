@@ -27,6 +27,10 @@ namespace Monos {
             return objectHit;
         }
 
+        private void OnCollisionEnter(Collision other) {
+            Debug.Log("debug");
+        }
+
         private void Update() {
             var gamepad = InputSystem.GetDevice<Gamepad>();
             var playerTransform = transform;

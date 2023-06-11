@@ -5,17 +5,22 @@ using Base.Blocks;
 using Base.Const;
 using Base.Manager;
 using Managers;
+using Monos;
 using Systems.Jobs;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
 using Unity.Mathematics;
+using Unity.Physics;
 using Unity.Rendering;
 using UnityEngine;
 using UnityEngine.Rendering;
 using Utils;
+using BoxCollider = Unity.Physics.BoxCollider;
+using Collider = Unity.Physics.Collider;
 using Entity = Unity.Entities.Entity;
 using EntityManager = Unity.Entities.EntityManager;
+using Material = UnityEngine.Material;
 
 namespace Systems {
     /// <summary>
@@ -67,7 +72,7 @@ namespace Systems {
             task.Complete();
             ecb.Playback(entityManager);
             ecb.Dispose();
-            entityManager.DestroyEntity(prototype);
+            // entityManager.DestroyEntity(prototype);
             state.Enabled = false;
         }
 
@@ -131,6 +136,22 @@ namespace Systems {
 
         private Entity GetBlockPrototype(EntityManager entityManager) {
             var cube = entityManager.CreateEntity();
+            var box = BoxCollider.Create(
+                new BoxGeometry {
+                    Center = new float3(0, 0, 0),
+                    Size = new float3(1, 1, 1),
+                    Orientation = quaternion.identity,
+                    BevelRadius = 0.01f
+                }
+            );
+            var collider = new PhysicsCollider {
+                Value = box
+            };
+            entityManager.AddComponentData(cube, collider);
+            entityManager.AddSharedComponentManaged(cube, new PhysicsWorldIndex {
+                Value = 0
+            });
+            
             var mesh = GenerateBlockMesh();
             const string blockId = "classic:air";
             // 注意，这里的材质是URP的材质，不是Unity的材质，且GetMergedTexture必须在GetBlockTexture之前调用

@@ -3,7 +3,6 @@ using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
 using Unity.Mathematics;
-using Unity.Physics;
 using Unity.Transforms;
 
 namespace Systems.Jobs {
@@ -15,10 +14,10 @@ namespace Systems.Jobs {
 
         public void Execute(int index) {
             var e = Ecb.Instantiate(index, Prototype);
+            // 添加这个组件才能让方块显示在世界里
             Ecb.SetComponent(index, e, new LocalToWorld {
                 Value = float4x4.Translate(Pos[index])
             });
-            // Ecb.SetComponent(index, e, );
         }
     }
 }
