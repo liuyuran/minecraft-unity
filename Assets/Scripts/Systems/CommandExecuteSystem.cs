@@ -1,12 +1,9 @@
 ﻿using System.Collections.Generic;
-using System.Threading;
-using Base;
 using Base.Blocks;
-using Base.Const;
-using Base.Manager;
+using Components;
 using Managers;
-using Monos;
 using Systems.Jobs;
+using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
@@ -17,7 +14,6 @@ using UnityEngine;
 using UnityEngine.Rendering;
 using Utils;
 using BoxCollider = Unity.Physics.BoxCollider;
-using Collider = Unity.Physics.Collider;
 using Entity = Unity.Entities.Entity;
 using EntityManager = Unity.Entities.EntityManager;
 using Material = UnityEngine.Material;
@@ -26,39 +22,47 @@ namespace Systems {
     /// <summary>
     /// 从基础库的支持类中获取命令执行队列，然后执行
     /// </summary>
+    [BurstCompile]
     public partial struct CommandExecuteSystem : ISystem {
+        [BurstCompile]
         public void OnCreate(ref SystemState state) {
-            new Thread(() => { Game.Start(""); }).Start();
-            Thread.Sleep(1000);
-            CommandTransferManager.NetworkAdapter?.JoinGame("Kamoeth");
+            state.RequireForUpdate<BlockGenerator>();
+            // new Thread(() => { Game.Start(""); }).Start();
+            // Thread.Sleep(1000);
+            // CommandTransferManager.NetworkAdapter?.JoinGame("Kamoeth");
         }
 
         public void OnDestroy(ref SystemState state) {
             //
         }
 
+        [BurstCompile]
         public void OnUpdate(ref SystemState state) {
-            var chunkQueue = CommandTransferManager.NetworkAdapter?.GetChunkForUser();
-            if (chunkQueue == null || chunkQueue.Length == 0) return;
-            var air = new Air();
+            // var chunkQueue = CommandTransferManager.NetworkAdapter?.GetChunkForUser();
+            // if (chunkQueue == null || chunkQueue.Length == 0) return;
+            // var air = new Air();
             var entityManager = state.EntityManager;
             var ecb = new EntityCommandBuffer(Allocator.TempJob);
             var prototype = GetBlockPrototype(entityManager);
             var transformArray = new List<float3>();
-            foreach (var chunk in chunkQueue) {
-                for (var x = 0; x < ParamConst.ChunkSize; x++) {
-                    for (var y = 0; y < ParamConst.ChunkSize; y++) {
-                        for (var z = 0; z < ParamConst.ChunkSize; z++) {
-                            var block = chunk.BlockData[x, y, z];
-                            if (block.ID == air.ID) continue;
-                            transformArray.Add(new float3(
-                                x + chunk.Position.X * ParamConst.ChunkSize, 
-                                y + chunk.Position.Y * ParamConst.ChunkSize, 
-                                z + chunk.Position.Z * ParamConst.ChunkSize));
-                        }
-                    }
-                }
-            }
+            // foreach (var chunk in chunkQueue) {
+            //     for (var x = 0; x < ParamConst.ChunkSize; x++) {
+            //         for (var y = 0; y < ParamConst.ChunkSize; y++) {
+            //             for (var z = 0; z < ParamConst.ChunkSize; z++) {
+            //                 var block = chunk.BlockData[x, y, z];
+            //                 if (block.ID == air.ID) continue;
+            //                 transformArray.Add(new float3(
+            //                     x + chunk.Position.X * ParamConst.ChunkSize, 
+            //                     y + chunk.Position.Y * ParamConst.ChunkSize, 
+            //                     z + chunk.Position.Z * ParamConst.ChunkSize));
+            //             }
+            //         }
+            //     }
+            // }
+            transformArray.Add(new float3(
+                5, 
+                5, 
+                5));
             var cubes = CollectionHelper.CreateNativeArray<float3>(transformArray.Count, Allocator.TempJob);
             for (var i = 0; i < transformArray.Count; i++) {
                 cubes[i] = transformArray[i];
@@ -76,6 +80,7 @@ namespace Systems {
             state.Enabled = false;
         }
 
+        [BurstCompile]
         private Mesh GenerateBlockMesh() {
             var mesh = new Mesh {
                 vertices = new Vector3[] {
@@ -134,24 +139,11 @@ namespace Systems {
             return mesh;
         }
 
+        [BurstCompile]
         private Entity GetBlockPrototype(EntityManager entityManager) {
-            var cube = entityManager.CreateEntity();
-            var box = BoxCollider.Create(
-                new BoxGeometry {
-                    Center = new float3(0, 0, 0),
-                    Size = new float3(1, 1, 1),
-                    Orientation = quaternion.identity,
-                    BevelRadius = 0.01f
-                }
-            );
-            var collider = new PhysicsCollider {
-                Value = box
-            };
-            entityManager.AddComponentData(cube, collider);
-            entityManager.AddSharedComponentManaged(cube, new PhysicsWorldIndex {
-                Value = 0
-            });
-            
+            var generator = SystemAPI.GetSingleton<BlockGenerator>();
+            var cube = generator.cube;
+
             var mesh = GenerateBlockMesh();
             const string blockId = "classic:air";
             // 注意，这里的材质是URP的材质，不是Unity的材质，且GetMergedTexture必须在GetBlockTexture之前调用

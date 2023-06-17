@@ -10,6 +10,7 @@ namespace Systems.Jobs {
     public struct BlockGenerateJob : IJobParallelFor {
         public Entity Prototype;
         public EntityCommandBuffer.ParallelWriter Ecb;
+        // 貌似这里只能用只读数组
         [ReadOnly] public NativeArray<float3> Pos;
 
         public void Execute(int index) {

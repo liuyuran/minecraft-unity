@@ -1,8 +1,7 @@
 ﻿using Unity.Entities;
-using UnityEngine;
 
-namespace Monos {
+namespace Components {
     public struct BlockGenerator: IComponentData {
-        public Entity ProtoType;
+        public Entity cube;
     }
 }
