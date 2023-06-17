@@ -19,6 +19,11 @@ namespace Systems.Jobs {
             Ecb.SetComponent(index, e, new LocalToWorld {
                 Value = float4x4.Translate(Pos[index])
             });
+            Ecb.SetComponent(index, e, new LocalTransform {
+                Position = Pos[index],
+                Rotation = quaternion.identity,
+                Scale = 1
+            });
         }
     }
 }
