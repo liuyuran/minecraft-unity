@@ -39,7 +39,6 @@ namespace Systems {
         public void OnUpdate(ref SystemState state) {
             var chunkQueue = CommandTransferManager.NetworkAdapter?.GetChunkForUser();
             if (chunkQueue == null || chunkQueue.Length == 0) return;
-            Debug.Log($"ChunkQueue: {chunkQueue.Length}");
             var entityManager = state.EntityManager;
             var ecb = new EntityCommandBuffer(Allocator.TempJob);
             var prototype = GetBlockPrototype(entityManager);
