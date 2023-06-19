@@ -48,7 +48,7 @@ namespace Systems {
                     for (var y = 0; y < ParamConst.ChunkSize; y++) {
                         for (var z = 0; z < ParamConst.ChunkSize; z++) {
                             var block = chunk.GetBlock(x, y, z);
-                            if (block.IsAir) continue;
+                            if (block.Transparent) continue;
                             transformArray.Add(new float3(
                                 x + chunk.Position.X * ParamConst.ChunkSize, 
                                 y + chunk.Position.Y * ParamConst.ChunkSize, 
