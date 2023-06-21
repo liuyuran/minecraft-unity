@@ -33,6 +33,7 @@ namespace Monos {
 
         private void Update() {
             var gamepad = InputSystem.GetDevice<Gamepad>();
+            if (gamepad == null) return;
             var playerTransform = transform;
             var transformF = firstPerson.transform;
             var transformT = thirdPerson.transform;

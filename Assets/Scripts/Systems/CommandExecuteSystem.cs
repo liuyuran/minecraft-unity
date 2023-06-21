@@ -3,6 +3,7 @@ using System.Threading;
 using Base;
 using Base.Const;
 using Base.Manager;
+using Base.Utils;
 using Components;
 using Managers;
 using Systems.Jobs;
@@ -42,29 +43,36 @@ namespace Systems {
             var entityManager = state.EntityManager;
             var ecb = new EntityCommandBuffer(Allocator.TempJob);
             var prototype = GetBlockPrototype(entityManager);
-            var transformArray = new List<float3>();
+            var transformArray = new List<BlockGenerateJob.BlockInfoForJob>();
             foreach (var chunk in chunkQueue) {
                 for (var x = 0; x < ParamConst.ChunkSize; x++) {
                     for (var y = 0; y < ParamConst.ChunkSize; y++) {
                         for (var z = 0; z < ParamConst.ChunkSize; z++) {
                             var block = chunk.GetBlock(x, y, z);
                             if (block.Transparent) continue;
-                            transformArray.Add(new float3(
-                                x + chunk.Position.X * ParamConst.ChunkSize, 
-                                y + chunk.Position.Y * ParamConst.ChunkSize, 
-                                z + chunk.Position.Z * ParamConst.ChunkSize));
+                            transformArray.Add(new BlockGenerateJob.BlockInfoForJob {
+                                Pos = new float3(
+                                    x + chunk.Position.X * ParamConst.ChunkSize,
+                                    y + chunk.Position.Y * ParamConst.ChunkSize,
+                                    z + chunk.Position.Z * ParamConst.ChunkSize
+                                ),
+                                RenderFlags = block.RenderFlags
+                            });
                         }
                     }
                 }
             }
-            var cubes = CollectionHelper.CreateNativeArray<float3>(transformArray.Count, Allocator.TempJob);
+
+            var cubes = CollectionHelper.CreateNativeArray<BlockGenerateJob.BlockInfoForJob>(transformArray.Count,
+                Allocator.TempJob);
             for (var i = 0; i < transformArray.Count; i++) {
                 cubes[i] = transformArray[i];
             }
+
             var job = new BlockGenerateJob {
                 Prototype = prototype,
                 Ecb = ecb.AsParallelWriter(),
-                Pos = cubes
+                Data = cubes
             };
             var task = job.Schedule(cubes.Length, 128);
             task.Complete();
@@ -73,91 +81,14 @@ namespace Systems {
             state.Enabled = false;
         }
 
-        private Mesh GenerateBlockMesh() {
-            var mesh = new Mesh {
-                vertices = new Vector3[] {
-                    // front face
-                    new(0, 0, 0),
-                    new(0, 1, 0),
-                    new(1, 1, 0),
-                    new(1, 0, 0),
-                    // back face
-                    new(1, 0, 1),
-                    new(1, 1, 1),
-                    new(0, 1, 1),
-                    new(0, 0, 1),
-                    // top face
-                    new(0, 1, 0),
-                    new(0, 1, 1),
-                    new(1, 1, 1),
-                    new(1, 1, 0),
-                    // bottom face
-                    new(0, 0, 1),
-                    new(0, 0, 0),
-                    new(1, 0, 0),
-                    new(1, 0, 1),
-                    // left face
-                    new(0, 0, 1),
-                    new(0, 1, 1),
-                    new(0, 1, 0),
-                    new(0, 0, 0),
-                    // right face
-                    new(1, 0, 0),
-                    new(1, 1, 0),
-                    new(1, 1, 1),
-                    new(1, 0, 1)
-                },
-                triangles = new[] {
-                    // front face
-                    0, 1, 2,
-                    2, 3, 0,
-                    // back face
-                    4, 5, 6,
-                    6, 7, 4,
-                    // top face
-                    8, 9, 10,
-                    10, 11, 8,
-                    // bottom face
-                    12, 13, 14,
-                    14, 15, 12,
-                    // left face
-                    16, 17, 18,
-                    18, 19, 16,
-                    // right face
-                    20, 21, 22,
-                    22, 23, 20
-                }
-            };
-            return mesh;
-        }
-
         private Entity GetBlockPrototype(EntityManager entityManager) {
             var generator = SystemAPI.GetSingleton<BlockGenerator>();
             var cube = generator.cube;
-            var mesh = GenerateBlockMesh();
             const string blockId = "classic:air";
-            // 注意，这里的材质是URP的材质，不是Unity的材质，且GetMergedTexture必须在GetBlockTexture之前调用
-            // 不然就会报材质找不到的错误，原因很简单，调用材质合成之后，子材质映射才会生效
-            var material = new Material(Shader.Find("Universal Render Pipeline/Lit")) {
-                mainTexture = BlockTypeManager.Instance.GetMergedTexture()
-            };
-            var uvs = new List<Vector2>();
-            uvs.AddRange(BlockTypeManager.Instance.GetBlockTexture(blockId, Direction.south));
-            uvs.AddRange(BlockTypeManager.Instance.GetBlockTexture(blockId, Direction.north));
-            uvs.AddRange(BlockTypeManager.Instance.GetBlockTexture(blockId, Direction.up));
-            uvs.AddRange(BlockTypeManager.Instance.GetBlockTexture(blockId, Direction.down));
-            uvs.AddRange(BlockTypeManager.Instance.GetBlockTexture(blockId, Direction.west));
-            uvs.AddRange(BlockTypeManager.Instance.GetBlockTexture(blockId, Direction.east));
-
-            mesh.SetUVs(0, uvs.ToArray());
-            mesh.RecalculateNormals();
             var desc = new RenderMeshDescription(
                 shadowCastingMode: ShadowCastingMode.Off,
                 receiveShadows: false);
-            var renderMeshArray = new RenderMeshArray(
-                new[] { material },
-                new[] { mesh }
-            );
+            var renderMeshArray = SubMeshCacheManager.Instance.GetCubeMesh(blockId, Chunk.Up | Chunk.Down | Chunk.Back | Chunk.Front | Chunk.Left | Chunk.Right);
             RenderMeshUtility.AddComponents(
                 cube,
                 entityManager,

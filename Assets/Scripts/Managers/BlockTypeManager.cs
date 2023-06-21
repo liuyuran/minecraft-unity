@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Base.Blocks;
 using Exceptions;
 using UnityEngine;
 using UnityEngine.Windows;
 using Utils;
+using Block = Base.Blocks.Block;
 
 namespace Managers {
     /// <summary>
@@ -15,19 +17,16 @@ namespace Managers {
         private int _textureSize = 512;
         private int _totalWidth;
         private int _totalHeight;
-        private readonly Dictionary<int, string> _idLink = new();
-        private readonly Dictionary<string, int> _idLinkRev = new();
         private readonly Dictionary<string, Type> _blockLink = new();
         private readonly Dictionary<string, Texture2D> _textureLink = new();
         private readonly Dictionary<string, Rect> _uvOffset = new();
-        private int _idGenerator;
         private bool _locked;
         private Texture2D _bigTexture;
 
         private BlockTypeManager() {
             RegisterBlock(new Air());
         }
-        
+
         /// <summary>
         /// 注册方块类型
         /// </summary>
@@ -35,12 +34,9 @@ namespace Managers {
         /// <exception cref="DuplicateBlockIdException">当重复注册同一个id时抛出此异常</exception>
         /// <exception cref="TextureLoadFailedException">方块贴图载入失败时抛出此异常</exception>
         /// <exception cref="BlockRegistryForbiddenException">游戏启动后注册方块会抛出此异常</exception>
-        private void RegisterBlock(IBlock obj) {
+        private void RegisterBlock(Block obj) {
             if (_locked) throw new BlockRegistryForbiddenException("出于性能考虑，游戏启动后禁止注册方块");
-            var numId = _idGenerator++;
             var blockId = obj.ID;
-            _idLink[numId] = blockId;
-            _idLinkRev[blockId] = numId;
             if (_blockLink.ContainsKey(blockId)) throw new DuplicateBlockIdException(blockId);
             _blockLink.Add(blockId, obj.GetType());
             var byteArray = File.ReadAllBytes($"{Application.dataPath}/Texture/{obj.Texture}");
@@ -59,25 +55,6 @@ namespace Managers {
         }
 
         /// <summary>
-        /// 转换为ECS使用的数字id
-        /// </summary>
-        /// <param name="id">方块数字id</param>
-        /// <returns>方块字符串id</returns>
-        public int ConvertToNumId(string id) {
-            return _idLinkRev[id];
-        }
-        
-        /// <summary>
-        /// 获取方块贴图在合成后大贴图中的UV坐标
-        /// </summary>
-        /// <param name="blockId">方块ID</param>
-        /// <param name="direction">目标面</param>
-        /// <returns>若该方块已注册，返回UV坐标</returns>
-        public IEnumerable<Vector2> GetBlockTexture(int blockId, Direction direction) {
-            return GetBlockTexture(_idLink[blockId], direction);
-        }
-
-        /// <summary>
         /// 获取方块贴图在合成后大贴图中的UV坐标
         /// </summary>
         /// <param name="blockId">方块ID</param>
@@ -89,16 +66,16 @@ namespace Managers {
             var uvs = new Vector2[4];
             switch (direction) {
                 case Direction.north:
-                    uvs[3] = new Vector2(1.0f, 0.0f);
                     uvs[0] = new Vector2(0.667f, 0.0f);
-                    uvs[2] = new Vector2(1.0f, 0.5f);
                     uvs[1] = new Vector2(0.667f, 0.5f);
+                    uvs[2] = new Vector2(1.0f, 0.5f);
+                    uvs[3] = new Vector2(1.0f, 0.0f);
                     break;
                 case Direction.south:
                     uvs[0] = new Vector2(0.0f, 0.0f);
-                    uvs[3] = new Vector2(0.333f, 0.0f);
                     uvs[1] = new Vector2(0.0f, 0.5f);
                     uvs[2] = new Vector2(0.333f, 0.5f);
+                    uvs[3] = new Vector2(0.333f, 0.0f);
                     break;
                 case Direction.east:
                     uvs[0] = new Vector2(0.667f, 0.5f);
@@ -113,9 +90,9 @@ namespace Managers {
                     uvs[3] = new Vector2(0.666f, 0.5f);
                     break;
                 case Direction.up:
+                    uvs[0] = new Vector2(0.334f, 0.0f);
                     uvs[1] = new Vector2(0.334f, 0.5f);
                     uvs[2] = new Vector2(0.666f, 0.5f);
-                    uvs[0] = new Vector2(0.334f, 0.0f);
                     uvs[3] = new Vector2(0.666f, 0.0f);
                     break;
                 case Direction.down:
@@ -177,6 +154,10 @@ namespace Managers {
         /// <param name="size">贴图尺寸，单位像素</param>
         public void SetTextureSize(int size) {
             _textureSize = size;
+        }
+        
+        public string[] GetBlockIds() {
+            return _uvOffset.Keys.ToArray();
         }
     }
 }
