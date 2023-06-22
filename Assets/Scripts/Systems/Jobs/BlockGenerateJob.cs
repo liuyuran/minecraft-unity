@@ -1,11 +1,8 @@
-﻿using Base.Utils;
-using Components;
-using Managers;
+﻿using Managers;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
 using Unity.Mathematics;
-using Unity.Rendering;
 using Unity.Transforms;
 using Entity = Unity.Entities.Entity;
 

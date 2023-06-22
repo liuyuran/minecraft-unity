@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using Base.Blocks;
 using Exceptions;
 using UnityEngine;
@@ -23,8 +24,23 @@ namespace Managers {
         private bool _locked;
         private Texture2D _bigTexture;
 
+        /// <summary>
+        /// 使用反射注册所有方块类型
+        /// </summary>
         private BlockTypeManager() {
-            RegisterBlock(new Air());
+            var assem = typeof(Block).Assembly;
+            var baseType = typeof(Block);
+            var types = assem.GetExportedTypes();
+            foreach (var type in types) {
+                if (type.IsAbstract || type.FullName == null) continue;
+                if (!type.IsSubclassOf(baseType)) continue;
+                if (assem.CreateInstance(
+                        type.FullName, false,
+                        BindingFlags.ExactBinding,
+                        null, new object[] { }, null, null
+                    ) is not Block instance) continue;
+                RegisterBlock(instance);
+            }
         }
 
         /// <summary>

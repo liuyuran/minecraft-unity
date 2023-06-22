@@ -48,6 +48,7 @@ namespace Systems {
                             var block = chunk.GetBlock(x, y, z);
                             if (block.Transparent) continue;
                             transformArray.Add(new BlockGenerateJob.BlockInfoForJob {
+                                BlockId = SubMeshCacheManager.Instance.GetMeshId(block.ID),
                                 Pos = new float3(
                                     x + chunk.Position.X * ParamConst.ChunkSize,
                                     y + chunk.Position.Y * ParamConst.ChunkSize,
@@ -59,15 +60,6 @@ namespace Systems {
                     }
                 }
             }
-            // transformArray.Add(new BlockGenerateJob.BlockInfoForJob {
-            //     BlockId = SubMeshCacheManager.Instance.GetMeshId("classic:air"),
-            //     Pos = new float3(
-            //         5,
-            //         5,
-            //         5
-            //     ),
-            //     RenderFlags = Chunk.Up | Chunk.Front
-            // });
 
             var cubes = CollectionHelper.CreateNativeArray<BlockGenerateJob.BlockInfoForJob>(transformArray.Count,
                 Allocator.TempJob);
