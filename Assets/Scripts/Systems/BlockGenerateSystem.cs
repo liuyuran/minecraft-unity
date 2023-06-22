@@ -15,17 +15,15 @@ using Unity.Mathematics;
 using Unity.Rendering;
 using UnityEngine;
 using UnityEngine.Rendering;
-using Utils;
 using Entity = Unity.Entities.Entity;
 using EntityManager = Unity.Entities.EntityManager;
-using Material = UnityEngine.Material;
 
 namespace Systems {
     /// <summary>
     /// 从基础库的支持类中获取命令执行队列，然后执行
     /// </summary>
     [BurstCompile]
-    public partial struct CommandExecuteSystem : ISystem {
+    public partial struct BlockGenerateSystem : ISystem {
         public void OnCreate(ref SystemState state) {
             state.RequireForUpdate<BlockGenerator>();
             new Thread(() => { Game.Start(""); }).Start();
@@ -40,6 +38,7 @@ namespace Systems {
         public void OnUpdate(ref SystemState state) {
             var chunkQueue = CommandTransferManager.NetworkAdapter?.GetChunkForUser();
             if (chunkQueue == null || chunkQueue.Length == 0) return;
+            SubMeshCacheManager.Instance.GetMeshId("classic:air");
             var entityManager = state.EntityManager;
             var ecb = new EntityCommandBuffer(Allocator.TempJob);
             var prototype = GetBlockPrototype(entityManager);
@@ -62,6 +61,15 @@ namespace Systems {
                     }
                 }
             }
+            // transformArray.Add(new BlockGenerateJob.BlockInfoForJob {
+            //     BlockId = SubMeshCacheManager.Instance.GetMeshId("classic:air"),
+            //     Pos = new float3(
+            //         5,
+            //         5,
+            //         5
+            //     ),
+            //     RenderFlags = Chunk.Up | Chunk.Front
+            // });
 
             var cubes = CollectionHelper.CreateNativeArray<BlockGenerateJob.BlockInfoForJob>(transformArray.Count,
                 Allocator.TempJob);
@@ -84,17 +92,6 @@ namespace Systems {
         private Entity GetBlockPrototype(EntityManager entityManager) {
             var generator = SystemAPI.GetSingleton<BlockGenerator>();
             var cube = generator.cube;
-            const string blockId = "classic:air";
-            var desc = new RenderMeshDescription(
-                shadowCastingMode: ShadowCastingMode.Off,
-                receiveShadows: false);
-            var renderMeshArray = SubMeshCacheManager.Instance.GetCubeMesh(blockId, Chunk.Up | Chunk.Down | Chunk.Back | Chunk.Front | Chunk.Left | Chunk.Right);
-            RenderMeshUtility.AddComponents(
-                cube,
-                entityManager,
-                desc,
-                renderMeshArray,
-                MaterialMeshInfo.FromRenderMeshArrayIndices(0, 0));
             return cube;
         }
     }

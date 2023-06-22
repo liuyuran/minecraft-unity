@@ -5,8 +5,8 @@ using UnityEngine.InputSystem;
 namespace Monos {
     public class Player: MonoBehaviour {
         private float _mXRotation;
-        private const float MoveSpeedScale = 0.25f;
-        private const float ScaleScale = 1.0f;
+        private const float MoveSpeedScale = 0.05f;
+        private const float ScaleScale = 1.5f;
         private const float MaxControlDistance = 5.0f;
         public Camera firstPerson;
         public Camera thirdPerson;

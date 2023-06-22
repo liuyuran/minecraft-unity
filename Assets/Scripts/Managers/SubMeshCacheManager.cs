@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Base.Utils;
+using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Rendering;
 using UnityEngine;
@@ -8,27 +9,28 @@ using Utils;
 namespace Managers {
     public class SubMeshCacheManager {
         public static SubMeshCacheManager Instance { get; } = new();
-        private readonly Dictionary<string, RenderMeshArray> _meshPrefabs = new();
-        private readonly Dictionary<string, RenderBounds> _meshRenderPrefabs = new();
-
-        private readonly Material _material = new(Shader.Find("Universal Render Pipeline/Lit")) {
-            mainTexture = BlockTypeManager.Instance.GetMergedTexture()
-        };
+        private readonly Dictionary<int, string> _meshCache = new();
+        private readonly Dictionary<string, int> _meshCacheRev = new();
+        private readonly Dictionary<string, MaterialMeshInfo> _meshPrefabs = new();
 
         private SubMeshCacheManager() {
+            var hybridRenderer = World.DefaultGameObjectInjectionWorld.GetExistingSystemManaged<EntitiesGraphicsSystem>();
             const int max = Chunk.Up | Chunk.Down | Chunk.Left | Chunk.Right | Chunk.Front | Chunk.Back;
             var blocks = BlockTypeManager.Instance.GetBlockIds();
+            var material = hybridRenderer.RegisterMaterial(new Material(Shader.Find("Universal Render Pipeline/Lit")) {
+                mainTexture = BlockTypeManager.Instance.GetMergedTexture()
+            });
             for (var i = 0; i < max + 1; i++) {
-                foreach (var blockId in blocks) {
+                for (var index = 0; index < blocks.Length; index++) {
+                    var blockId = blocks[index];
+                    _meshCache[index] = blockId;
+                    _meshCacheRev[blockId] = index;
                     var mesh = GenerateCubeMeshInfo(i);
                     ApplyUV(mesh, blockId, i);
-                    var arr = new RenderMeshArray(
-                        new[] { _material },
-                        new[] { mesh }
-                    );
-                    _meshPrefabs.Add($"cube:{blockId}:{i}", arr);
-                    _meshRenderPrefabs.Add($"cube:{blockId}:{i}", new RenderBounds {
-                        Value = arr.Meshes[0].bounds.ToAABB()
+                    var meshID = hybridRenderer.RegisterMesh(mesh);
+                    _meshPrefabs.Add($"cube:{blockId}:{i}", new MaterialMeshInfo {
+                        Material = (int)material.value,
+                        Mesh = (int)meshID.value
                     });
                 }
             }
@@ -170,12 +172,12 @@ namespace Managers {
             mesh.RecalculateNormals();
         }
         
-        public RenderMeshArray GetCubeMesh(string blockId, int renderFlag) {
-            return _meshPrefabs[$"cube:{blockId}:{renderFlag}"];
+        public MaterialMeshInfo GetCubeMesh(int blockId, int renderFlag) {
+            return _meshPrefabs[$"cube:{_meshCache[blockId]}:{renderFlag}"];
         }
         
-        public RenderBounds GetCubeMeshRender(string blockId, int renderFlag) {
-            return _meshRenderPrefabs[$"cube:{blockId}:{renderFlag}"];
+        public int GetMeshId(string blockId) {
+            return _meshCacheRev[blockId];
         }
     }
 }

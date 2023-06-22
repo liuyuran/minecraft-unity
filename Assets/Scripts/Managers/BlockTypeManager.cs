@@ -157,7 +157,7 @@ namespace Managers {
         }
         
         public string[] GetBlockIds() {
-            return _uvOffset.Keys.ToArray();
+            return _blockLink.Keys.ToArray();
         }
     }
 }
