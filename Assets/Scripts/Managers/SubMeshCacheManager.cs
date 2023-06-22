@@ -9,6 +9,7 @@ using Utils;
 namespace Managers {
     public class SubMeshCacheManager {
         public static SubMeshCacheManager Instance { get; } = new();
+        public readonly AABB RenderEdge;
         private readonly Dictionary<int, string> _meshCache = new();
         private readonly Dictionary<string, int> _meshCacheRev = new();
         private readonly Dictionary<string, MaterialMeshInfo> _meshPrefabs = new();
@@ -32,6 +33,9 @@ namespace Managers {
                         Material = (int)material.value,
                         Mesh = (int)meshID.value
                     });
+                    if (i == max && index == 0) {
+                        RenderEdge = mesh.bounds.ToAABB();
+                    }
                 }
             }
         }

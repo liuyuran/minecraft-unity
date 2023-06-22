@@ -3,7 +3,6 @@ using System.Threading;
 using Base;
 using Base.Const;
 using Base.Manager;
-using Base.Utils;
 using Components;
 using Managers;
 using Systems.Jobs;
@@ -13,8 +12,6 @@ using Unity.Entities;
 using Unity.Jobs;
 using Unity.Mathematics;
 using Unity.Rendering;
-using UnityEngine;
-using UnityEngine.Rendering;
 using Entity = Unity.Entities.Entity;
 using EntityManager = Unity.Entities.EntityManager;
 
@@ -38,6 +35,7 @@ namespace Systems {
         public void OnUpdate(ref SystemState state) {
             var chunkQueue = CommandTransferManager.NetworkAdapter?.GetChunkForUser();
             if (chunkQueue == null || chunkQueue.Length == 0) return;
+            // 下一行看似没有意义，但是必须在这里预先获取Instance对象，不然会出问题
             SubMeshCacheManager.Instance.GetMeshId("classic:air");
             var entityManager = state.EntityManager;
             var ecb = new EntityCommandBuffer(Allocator.TempJob);
@@ -92,6 +90,7 @@ namespace Systems {
         private Entity GetBlockPrototype(EntityManager entityManager) {
             var generator = SystemAPI.GetSingleton<BlockGenerator>();
             var cube = generator.cube;
+            entityManager.AddComponentData(cube, new RenderBounds { Value = SubMeshCacheManager.Instance.RenderEdge });
             return cube;
         }
     }
