@@ -105,11 +105,11 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.localization": {
-      "version": "1.4.3",
+      "version": "1.4.4",
       "depth": 0,
       "source": "registry",
       "dependencies": {
-        "com.unity.addressables": "1.20.5",
+        "com.unity.addressables": "1.21.8",
         "com.unity.nuget.newtonsoft-json": "3.0.2"
       },
       "url": "https://packages.unity.com"
@@ -233,7 +233,7 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.timeline": {
-      "version": "1.8.3",
+      "version": "1.8.4",
       "depth": 0,
       "source": "registry",
       "dependencies": {
