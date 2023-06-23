@@ -12,6 +12,7 @@ using Unity.Entities;
 using Unity.Jobs;
 using Unity.Mathematics;
 using Unity.Rendering;
+using UnityEngine;
 using Entity = Unity.Entities.Entity;
 using EntityManager = Unity.Entities.EntityManager;
 
@@ -22,7 +23,7 @@ namespace Systems {
     [BurstCompile]
     public partial struct BlockGenerateSystem : ISystem {
         public void OnCreate(ref SystemState state) {
-            state.RequireForUpdate<BlockGenerator>();
+            state.RequireForUpdate<EntityGenerator>();
             new Thread(() => { Game.Start(""); }).Start();
             Thread.Sleep(1000);
             CommandTransferManager.NetworkAdapter?.JoinGame("Kamoeth");
@@ -54,7 +55,8 @@ namespace Systems {
                                     y + chunk.Position.Y * ParamConst.ChunkSize,
                                     z + chunk.Position.Z * ParamConst.ChunkSize
                                 ),
-                                RenderFlags = block.RenderFlags
+                                RenderFlags = block.RenderFlags,
+                                ChunkPos = new Vector3(chunk.Position.X, chunk.Position.Y, chunk.Position.Z)
                             });
                         }
                     }
@@ -74,14 +76,17 @@ namespace Systems {
             };
             var task = job.Schedule(cubes.Length, 128);
             task.Complete();
+            // LocalChunkManager.Instance.AutoUnloadChunk(entityManager, new Vector3());
             ecb.Playback(entityManager);
             ecb.Dispose();
+            cubes.Dispose();
             state.Enabled = false;
         }
 
         private Entity GetBlockPrototype(EntityManager entityManager) {
-            var generator = SystemAPI.GetSingleton<BlockGenerator>();
-            var cube = generator.cube;
+            var generator = SystemAPI.GetSingleton<EntityGenerator>();
+            var cube = generator.Cube;
+            entityManager.AddComponent<Block>(cube);
             entityManager.AddComponentData(cube, new RenderBounds { Value = SubMeshCacheManager.Instance.RenderEdge });
             return cube;
         }
