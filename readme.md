@@ -9,6 +9,11 @@ All document is base on chinese, but I can use some english and few japanese, so
 
 progress
 ---
-[x] show blocks by unity dots and physics
-[x] split client and server, maybe someday I can implement a standalone server in future
-[ ] make some texture by myself, wanna to avoid all trouble about copyright, especially from microsoft (progressing)
+
+- [x] show blocks by unity dots and physics
+- [x] split client and server, maybe someday I can implement a standalone server in future
+- [ ] make some texture by myself, wanna to avoid all trouble about copyright, especially from microsoft (progressing)
+- [X] create a camera with ecs physics
+- [X] create input system profile and use it, so can both support gamepad and keyboard >_<
+- [ ] in-game gui that can be add extension (learning)
+- [ ] start-game gui (learning)

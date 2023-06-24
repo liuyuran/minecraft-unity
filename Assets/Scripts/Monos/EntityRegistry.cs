@@ -1,6 +1,7 @@
 ﻿using Components;
 using Unity.Entities;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Monos {
     public class EntityRegistry: MonoBehaviour {
