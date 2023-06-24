@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Security.Cryptography;
-using Components;
+﻿using Components;
 using Managers;
 using Unity.Collections;
 using Unity.Entities;

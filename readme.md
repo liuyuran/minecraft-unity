@@ -7,6 +7,10 @@ But who cares lol, I just want use newest tool, and create my own game branch.
 
 All document is base on chinese, but I can use some english and few japanese, so feel free if someone want create issue.
 
+If you interest on that, and want to compile, please note, that project is a subproject of https://github.com/liuyuran/minecraft-csharp.
+
+And should create `Scripts/PreCompile` folder and compile the `minecraft-base` first, after the two step, you can open it via rider or unity editor.
+
 progress
 ---
 [x] show blocks by unity dots and physics
