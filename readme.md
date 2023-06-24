@@ -13,10 +13,11 @@ And should create `Scripts/PreCompile` folder and compile the `minecraft-base` f
 
 progress
 ---
-[x] show blocks by unity dots and physics
-[x] split client and server, maybe someday I can implement a standalone server in future
-[ ] make some texture by myself, wanna to avoid all trouble about copyright, especially from microsoft (progressing)
-[X] create a camera with ecs physics
-[X] create input system profile and use it, so can both support gamepad and keyboard >_<
-[ ] in-game gui that can be add extension (learning)
-[ ] start-game gui (learning)
+
+- [x] show blocks by unity dots and physics
+- [x] split client and server, maybe someday I can implement a standalone server in future
+- [ ] make some texture by myself, wanna to avoid all trouble about copyright, especially from microsoft (progressing)
+- [X] create a camera with ecs physics
+- [X] create input system profile and use it, so can both support gamepad and keyboard >_<
+- [ ] in-game gui that can be add extension (learning)
+- [ ] start-game gui (learning)
