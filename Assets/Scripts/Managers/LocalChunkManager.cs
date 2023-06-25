@@ -12,9 +12,21 @@ namespace Managers {
     [SuppressMessage("ReSharper", "UnusedMember.Global")]
     public class LocalChunkManager {
         public static LocalChunkManager Instance { get; } = new();
+        private readonly ConcurrentDictionary<Vector3, long> _chunkVersionCache = new();
         private readonly ConcurrentDictionary<Vector3, List<Entity>> _chunkCache = new();
 
         private LocalChunkManager() { }
+        
+        public void AddChunkVersion(Vector3 pos, long version) {
+            _chunkVersionCache[pos] = version;
+        }
+        
+        public long GetChunkVersion(Vector3 pos) {
+            if (!_chunkVersionCache.TryGetValue(pos, out _)) {
+                return -1;
+            }
+            return _chunkVersionCache[pos];
+        }
 
         public void AddChunk(Vector3 pos, List<Entity> entities) {
             if (_chunkCache.TryGetValue(pos, out var value)) {
@@ -40,15 +52,15 @@ namespace Managers {
             _chunkCache.TryRemove(pos, out _);
         }
         
-        private void UnloadChunk(EntityManager manager, Vector3 pos) {
+        private void UnloadChunk(EntityCommandBuffer ecb, Vector3 pos) {
             var chunk = GetChunk(pos);
             foreach (var entity in chunk) {
-                manager.DestroyEntity(entity);
+                ecb.DestroyEntity(entity);
             }
             RemoveChunk(pos);
         }
         
-        public void AutoUnloadChunk(EntityManager manager, Vector3 playerPos) {
+        public void AutoUnloadChunk(EntityCommandBuffer ecb, Vector3 playerPos) {
             var allChunks = new HashSet<Vector3>(_chunkCache.Keys);
             for (var x = -ParamConst.DisplayDistance; x <= ParamConst.DisplayDistance; x++) {
                 for (var y = -ParamConst.DisplayDistance; y <= ParamConst.DisplayDistance; y++) {
@@ -58,7 +70,8 @@ namespace Managers {
                 }
             }
             foreach (var pos in allChunks) {
-                UnloadChunk(manager, pos);
+                UnloadChunk(ecb, pos);
+                _chunkVersionCache.TryRemove(pos, out _);
             }
         }
     }

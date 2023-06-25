@@ -3,6 +3,7 @@ using System.Threading;
 using Base;
 using Base.Const;
 using Base.Manager;
+using Camera;
 using Components;
 using Managers;
 using Systems.Jobs;
@@ -40,9 +41,24 @@ namespace Systems {
             SubMeshCacheManager.Instance.GetMeshId("classic:air");
             var entityManager = state.EntityManager;
             var ecb = new EntityCommandBuffer(Allocator.TempJob);
+            // 开始卸载区块
+            var self = SystemAPI.Query<RefRO<Player>, RefRO<Self>>();
+            foreach (var (player, _) in self) {
+                // 也许之后会因为bug出现多个【自身】概念，这里强制锁定为第一个，这样或许可以增加发现问题的概率
+                LocalChunkManager.Instance.AutoUnloadChunk(ecb, player.ValueRO.Pos);    
+                break;
+            }
+            // 开始刷新区块
             var prototype = GetBlockPrototype(entityManager);
             var transformArray = new List<BlockGenerateJob.BlockInfoForJob>();
             foreach (var chunk in chunkQueue) {
+                // TODO 如何在检测到差异之后，用相对较低的代价来更新部分方块，而不是全部？
+                var pos = new Vector3(
+                    chunk.Position.X,
+                    chunk.Position.Y,
+                    chunk.Position.Z
+                );
+                if (chunk.Version == LocalChunkManager.Instance.GetChunkVersion(pos)) continue;
                 for (var x = 0; x < ParamConst.ChunkSize; x++) {
                     for (var y = 0; y < ParamConst.ChunkSize; y++) {
                         for (var z = 0; z < ParamConst.ChunkSize; z++) {
@@ -51,16 +67,17 @@ namespace Systems {
                             transformArray.Add(new BlockGenerateJob.BlockInfoForJob {
                                 BlockId = SubMeshCacheManager.Instance.GetMeshId(block.ID),
                                 Pos = new float3(
-                                    x + chunk.Position.X * ParamConst.ChunkSize,
-                                    y + chunk.Position.Y * ParamConst.ChunkSize,
-                                    z + chunk.Position.Z * ParamConst.ChunkSize
+                                    x + pos.x * ParamConst.ChunkSize,
+                                    y + pos.y * ParamConst.ChunkSize,
+                                    z + pos.z * ParamConst.ChunkSize
                                 ),
                                 RenderFlags = block.RenderFlags,
-                                ChunkPos = new Vector3(chunk.Position.X, chunk.Position.Y, chunk.Position.Z)
+                                ChunkPos = pos
                             });
                         }
                     }
                 }
+                LocalChunkManager.Instance.AddChunkVersion(pos, chunk.Version);
             }
 
             var cubes = CollectionHelper.CreateNativeArray<BlockGenerateJob.BlockInfoForJob>(transformArray.Count,
@@ -76,7 +93,6 @@ namespace Systems {
             };
             var task = job.Schedule(cubes.Length, 128);
             task.Complete();
-            // LocalChunkManager.Instance.AutoUnloadChunk(entityManager, new Vector3());
             ecb.Playback(entityManager);
             ecb.Dispose();
             cubes.Dispose();

@@ -42,7 +42,7 @@ namespace Systems.Jobs {
                 Data[index].BlockId,
                 Data[index].RenderFlags
             ));
-            // LocalChunkManager.Instance.AddChunk(Data[index].ChunkPos, e);
+            LocalChunkManager.Instance.AddChunk(Data[index].ChunkPos, e);
         }
     }
 }
