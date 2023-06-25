@@ -60,6 +60,7 @@ namespace Managers {
             RemoveChunk(pos);
         }
         
+        // InvalidOperationException: System.InvalidOperationException: playbackState.CreateEntityBatch passed to SelectEntity is null (likely due to an ECB command recording an invalid temporary Entity).
         public void AutoUnloadChunk(EntityCommandBuffer ecb, Vector3 playerPos) {
             var allChunks = new HashSet<Vector3>(_chunkCache.Keys);
             for (var x = -ParamConst.DisplayDistance; x <= ParamConst.DisplayDistance; x++) {
