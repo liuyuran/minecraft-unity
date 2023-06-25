@@ -42,12 +42,11 @@ namespace Systems {
             var entityManager = state.EntityManager;
             var ecb = new EntityCommandBuffer(Allocator.TempJob);
             // 开始卸载区块
-            var self = SystemAPI.Query<RefRO<Player>, RefRO<Self>>();
-            foreach (var (player, _) in self) {
-                // 也许之后会因为bug出现多个【自身】概念，这里强制锁定为第一个，这样或许可以增加发现问题的概率
-                LocalChunkManager.Instance.AutoUnloadChunk(ecb, player.ValueRO.Pos);    
-                break;
-            }
+            // foreach (var (player, _) in SystemAPI.Query<RefRO<Player>, RefRO<Self>>()) {
+            //     // 也许之后会因为bug出现多个【自身】概念，这里强制锁定为第一个，这样或许可以增加发现问题的概率
+            //     LocalChunkManager.Instance.AutoUnloadChunk(ecb, player.ValueRO.Pos);    
+            //     break;
+            // }
             // 开始刷新区块
             var prototype = GetBlockPrototype(entityManager);
             var transformArray = new List<BlockGenerateJob.BlockInfoForJob>();
@@ -96,7 +95,6 @@ namespace Systems {
             ecb.Playback(entityManager);
             ecb.Dispose();
             cubes.Dispose();
-            state.Enabled = false;
         }
 
         private Entity GetBlockPrototype(EntityManager entityManager) {

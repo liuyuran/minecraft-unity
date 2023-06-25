@@ -1,3 +1,4 @@
+using Base.Const;
 using Unity.Burst;
 using Unity.Entities;
 using Unity.Mathematics;
@@ -22,7 +23,7 @@ namespace Camera {
 
         [BurstCompile]
         protected override void OnUpdate() {
-            Entities.WithAll<Player>()
+            Entities.WithAll<Player, Self>()
                 .ForEach((ref PhysicsMass mass) => {
                     mass.InverseInertia.x = 0;
                     mass.InverseInertia.z = 0;
@@ -36,7 +37,7 @@ namespace Camera {
             var currentQuaternion = Quaternion.Euler(0, cameraRotation.y, 0);
             var leftStick = _standardActions.Move.ReadValue<Vector2>();
             var jump = _standardActions.Jump.triggered;
-            Entities.WithAll<Player>().ForEach(
+            Entities.WithAll<Player, Self>().ForEach(
                 (Entity entity, ref LocalToWorld localToWorld, ref PhysicsVelocity vel, ref PhysicsMass mass) => {
                     mass.InverseInertia.x = 0;
                     mass.InverseInertia.z = 0;
@@ -64,6 +65,10 @@ namespace Camera {
                 }
             ).WithoutBurst().Run();
             cameraTransform.position = cameraPos;
+            Entities.WithAll<Player, Self>()
+                .ForEach((ref Player player) => {
+                    player.Pos = cameraPos;
+                }).Run();
         }
     }
 }
