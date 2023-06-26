@@ -17,8 +17,6 @@ namespace Systems {
     public partial class BlockCleanSystem : SystemBase {
         [BurstCompile]
         protected override void OnUpdate() {
-            // 下一行看似没有意义，但是必须在这里预先获取Instance对象，不然会出问题
-            SubMeshCacheManager.Instance.GetMeshId("classic:air");
             var entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
             var ecb = new EntityCommandBuffer(Allocator.TempJob);
             var chunks = new HashSet<Vector3>();
