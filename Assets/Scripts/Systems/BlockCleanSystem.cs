@@ -39,6 +39,7 @@ namespace Systems {
 
             ecb.Playback(entityManager);
             ecb.Dispose();
+            LocalChunkManager.Instance.RemoveChunks(chunks);
         }
     }
 }

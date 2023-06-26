@@ -94,6 +94,7 @@ namespace Systems {
             var generator = SystemAPI.GetSingleton<EntityGenerator>();
             var cube = generator.Cube;
             entityManager.AddComponent<Block>(cube);
+            entityManager.AddComponent<Chunk>(cube);
             entityManager.AddComponentData(cube, new RenderBounds { Value = SubMeshCacheManager.Instance.RenderEdge });
             return cube;
         }

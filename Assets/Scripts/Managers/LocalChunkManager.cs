@@ -1,4 +1,5 @@
-﻿using System.Collections.Concurrent;
+﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using Base.Const;
@@ -27,11 +28,15 @@ namespace Managers {
         }
         
         public IEnumerable<Vector3> AutoUnloadChunk(Vector3 playerPos) {
+            var position = playerPos + new Vector3();
+            position.x = (float)Math.Round(position.x / ParamConst.ChunkSize);
+            position.y = (float)Math.Round(position.y / ParamConst.ChunkSize);
+            position.z = (float)Math.Round(position.z / ParamConst.ChunkSize);
             var allChunks = new HashSet<Vector3>(_chunkVersionCache.Keys);
             for (var x = -ParamConst.DisplayDistance; x <= ParamConst.DisplayDistance; x++) {
                 for (var y = -ParamConst.DisplayDistance; y <= ParamConst.DisplayDistance; y++) {
                     for (var z = -ParamConst.DisplayDistance; z <= ParamConst.DisplayDistance; z++) {
-                        allChunks.Remove(playerPos + new Vector3(x, y, z));
+                        allChunks.Remove(position + new Vector3(x, y, z));
                     }
                 }
             }
