@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using Base.Const;
-using Unity.Entities;
 using UnityEngine;
 
 namespace Managers {
@@ -13,7 +12,6 @@ namespace Managers {
     public class LocalChunkManager {
         public static LocalChunkManager Instance { get; } = new();
         private readonly ConcurrentDictionary<Vector3, long> _chunkVersionCache = new();
-        private readonly ConcurrentDictionary<Vector3, List<Entity>> _chunkCache = new();
 
         private LocalChunkManager() { }
         
@@ -27,42 +25,9 @@ namespace Managers {
             }
             return _chunkVersionCache[pos];
         }
-
-        public void AddChunk(Vector3 pos, List<Entity> entities) {
-            if (_chunkCache.TryGetValue(pos, out var value)) {
-                value.AddRange(entities);
-                return;
-            }
-            _chunkCache[pos] = entities;
-        }
         
-        public void AddChunk(Vector3 pos, Entity entity) {
-            if (_chunkCache.TryGetValue(pos, out var value)) {
-                value.Add(entity);
-                return;
-            }
-            _chunkCache[pos] = new List<Entity> {entity};
-        }
-        
-        public List<Entity> GetChunk(Vector3 pos) {
-            return _chunkCache[pos];
-        }
-
-        public void RemoveChunk(Vector3 pos) {
-            _chunkCache.TryRemove(pos, out _);
-        }
-        
-        private void UnloadChunk(EntityCommandBuffer ecb, Vector3 pos) {
-            var chunk = GetChunk(pos);
-            foreach (var entity in chunk) {
-                ecb.DestroyEntity(entity);
-            }
-            RemoveChunk(pos);
-        }
-        
-        // InvalidOperationException: System.InvalidOperationException: playbackState.CreateEntityBatch passed to SelectEntity is null (likely due to an ECB command recording an invalid temporary Entity).
-        public void AutoUnloadChunk(EntityCommandBuffer ecb, Vector3 playerPos) {
-            var allChunks = new HashSet<Vector3>(_chunkCache.Keys);
+        public IEnumerable<Vector3> AutoUnloadChunk(Vector3 playerPos) {
+            var allChunks = new HashSet<Vector3>(_chunkVersionCache.Keys);
             for (var x = -ParamConst.DisplayDistance; x <= ParamConst.DisplayDistance; x++) {
                 for (var y = -ParamConst.DisplayDistance; y <= ParamConst.DisplayDistance; y++) {
                     for (var z = -ParamConst.DisplayDistance; z <= ParamConst.DisplayDistance; z++) {
@@ -70,9 +35,12 @@ namespace Managers {
                     }
                 }
             }
-            foreach (var pos in allChunks) {
-                UnloadChunk(ecb, pos);
-                _chunkVersionCache.TryRemove(pos, out _);
+            return allChunks;
+        }
+        
+        public void RemoveChunks(HashSet<Vector3> chunks) {
+            foreach (var chunk in chunks) {
+                _chunkVersionCache.Remove(chunk, out _);
             }
         }
     }
