@@ -83,7 +83,7 @@ namespace Systems {
                 Ecb = ecb.AsParallelWriter(),
                 Data = cubes
             };
-            var task = job.Schedule(cubes.Length, 128);
+            var task = job.Schedule(cubes.Length, 256);
             task.Complete();
             ecb.Playback(entityManager);
             ecb.Dispose();

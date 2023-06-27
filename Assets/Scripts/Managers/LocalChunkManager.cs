@@ -33,9 +33,9 @@ namespace Managers {
             position.y = (float)Math.Round(position.y / ParamConst.ChunkSize);
             position.z = (float)Math.Round(position.z / ParamConst.ChunkSize);
             var allChunks = new HashSet<Vector3>(_chunkVersionCache.Keys);
-            for (var x = -ParamConst.DisplayDistance; x <= ParamConst.DisplayDistance; x++) {
-                for (var y = -ParamConst.DisplayDistance; y <= ParamConst.DisplayDistance; y++) {
-                    for (var z = -ParamConst.DisplayDistance; z <= ParamConst.DisplayDistance; z++) {
+            for (var x = -ParamConst.DisplayDistance - 1; x <= ParamConst.DisplayDistance + 1; x++) {
+                for (var y = -ParamConst.DisplayDistance - 1; y <= ParamConst.DisplayDistance + 1; y++) {
+                    for (var z = -ParamConst.DisplayDistance - 1; z <= ParamConst.DisplayDistance + 1; z++) {
                         allChunks.Remove(position + new Vector3(x, y, z));
                     }
                 }

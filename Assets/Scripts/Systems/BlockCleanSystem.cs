@@ -5,7 +5,6 @@ using Managers;
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
-using Unity.VisualScripting;
 using UnityEngine;
 using Entity = Unity.Entities.Entity;
 
@@ -22,7 +21,11 @@ namespace Systems {
             var chunks = new HashSet<Vector3>();
             // 查找区块
             foreach (var (player, _) in SystemAPI.Query<RefRO<Player>, RefRO<Self>>()) {
-                chunks.AddRange(LocalChunkManager.Instance.AutoUnloadChunk(player.ValueRO.Pos));
+                var chunkList = LocalChunkManager.Instance.AutoUnloadChunk(player.ValueRO.Pos);
+                foreach (var pos in chunkList) {
+                    chunks.Add(pos);
+                    if (chunks.Count > 1) break;
+                }
             }
 
             // 卸载区块
