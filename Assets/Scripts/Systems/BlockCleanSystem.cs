@@ -14,6 +14,10 @@ namespace Systems {
     /// </summary>
     [BurstCompile]
     public partial class BlockCleanSystem : SystemBase {
+        protected override void OnCreate() {
+            Enabled = false;
+        }
+
         [BurstCompile]
         protected override void OnUpdate() {
             var entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
@@ -24,7 +28,6 @@ namespace Systems {
                 var chunkList = LocalChunkManager.Instance.AutoUnloadChunk(player.ValueRO.Pos);
                 foreach (var pos in chunkList) {
                     chunks.Add(pos);
-                    if (chunks.Count > 1) break;
                 }
             }
 
