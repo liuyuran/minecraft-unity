@@ -21,7 +21,6 @@ namespace Systems {
         [BurstCompile]
         protected override void OnUpdate() {
             var entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
-            var ecb = new EntityCommandBuffer(Allocator.TempJob);
             var chunks = new HashSet<Vector3>();
             // 查找区块
             foreach (var (player, _) in SystemAPI.Query<RefRO<Player>, RefRO<Self>>()) {
@@ -38,14 +37,18 @@ namespace Systems {
                     Pos = chunkPos
                 }).ForEach((Entity entity) => transformArray.Add(entity)).WithoutBurst().Run();
             }
-
-            foreach (var entity in transformArray) {
-                ecb.DestroyEntity(entity);
+            var cubes = CollectionHelper.CreateNativeArray<Entity>(transformArray.Count,
+                Allocator.TempJob);
+            for (var index = 0; index < transformArray.Count; index++) {
+                var entity = transformArray[index];
+                cubes[index] = entity;
             }
-
-            ecb.Playback(entityManager);
-            ecb.Dispose();
+            entityManager.AddComponent<Disabled>(cubes);
+            cubes.Dispose();
             LocalChunkManager.Instance.RemoveChunks(chunks);
+            
+            // 清理区块
+            entityManager.DestroyEntity(GetEntityQuery(typeof(Disabled)));
         }
     }
 }
