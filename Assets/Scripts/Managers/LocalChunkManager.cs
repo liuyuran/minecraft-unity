@@ -27,7 +27,7 @@ namespace Managers {
             return _chunkVersionCache[pos];
         }
         
-        public IEnumerable<Vector3> AutoUnloadChunk(Vector3 playerPos) {
+        public HashSet<Vector3> AutoUnloadChunk(Vector3 playerPos) {
             var position = playerPos + new Vector3();
             position.x = (float)Math.Round(position.x / ParamConst.ChunkSize);
             position.y = (float)Math.Round(position.y / ParamConst.ChunkSize);

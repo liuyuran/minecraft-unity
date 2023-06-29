@@ -2,25 +2,37 @@
 using Camera;
 using Components;
 using Managers;
+using Systems.SystemGroups;
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
 using UnityEngine;
-using Entity = Unity.Entities.Entity;
 
 namespace Systems {
     /// <summary>
     /// 清理区块
     /// </summary>
     [BurstCompile]
-    public partial class BlockCleanSystem : SystemBase {
-        protected override void OnCreate() {
-            Enabled = false;
+    [UpdateInGroup(typeof(GameSystemGroup))]
+    public partial struct BlockCleanSystem : ISystem {
+        private EntityQuery _query;
+        
+        [BurstCompile]
+        public void OnCreate(ref SystemState state) {
+            _query = new EntityQueryBuilder(Allocator.Temp)
+                .WithAll<Disabled>()
+                .Build(state.EntityManager);
+        }
+        
+        [BurstCompile]
+        public void OnDestroy(ref SystemState state) {
+            _query.Dispose();
         }
 
-        [BurstCompile]
-        protected override void OnUpdate() {
-            var entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
+        public void OnUpdate(ref SystemState state) {
+            var entityManager = state.EntityManager;
+            // 清理此前禁用的区块
+            entityManager.DestroyEntity(_query);
             var chunks = new HashSet<Vector3>();
             // 查找区块
             foreach (var (player, _) in SystemAPI.Query<RefRO<Player>, RefRO<Self>>()) {
@@ -29,26 +41,18 @@ namespace Systems {
                     chunks.Add(pos);
                 }
             }
-
             // 卸载区块
-            var transformArray = new List<Entity>();
+            var query = new EntityQueryBuilder(Allocator.Temp)
+                .WithAll<Chunk>()
+                .Build(state.EntityManager);
             foreach (var chunkPos in chunks) {
-                Entities.WithSharedComponentFilter(new Chunk {
+                query.ResetFilter();
+                query.SetSharedComponentFilter(new Chunk {
                     Pos = chunkPos
-                }).ForEach((Entity entity) => transformArray.Add(entity)).WithoutBurst().Run();
+                });
+                entityManager.AddComponent<Disabled>(query);
             }
-            var cubes = CollectionHelper.CreateNativeArray<Entity>(transformArray.Count,
-                Allocator.TempJob);
-            for (var index = 0; index < transformArray.Count; index++) {
-                var entity = transformArray[index];
-                cubes[index] = entity;
-            }
-            entityManager.AddComponent<Disabled>(cubes);
-            cubes.Dispose();
             LocalChunkManager.Instance.RemoveChunks(chunks);
-            
-            // 清理区块
-            entityManager.DestroyEntity(GetEntityQuery(typeof(Disabled)));
         }
     }
 }

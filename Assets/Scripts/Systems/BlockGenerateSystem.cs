@@ -6,6 +6,7 @@ using Base.Manager;
 using Components;
 using Managers;
 using Systems.Jobs;
+using Systems.SystemGroups;
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
@@ -21,6 +22,7 @@ namespace Systems {
     /// 从基础库的支持类中获取命令执行队列，然后执行
     /// </summary>
     [BurstCompile]
+    [UpdateInGroup(typeof(GameSystemGroup))]
     public partial struct BlockGenerateSystem : ISystem {
         public void OnCreate(ref SystemState state) {
             state.RequireForUpdate<EntityGenerator>();

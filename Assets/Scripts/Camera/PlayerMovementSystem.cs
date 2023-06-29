@@ -1,3 +1,5 @@
+using Managers;
+using Systems.SystemGroups;
 using Unity.Burst;
 using Unity.Entities;
 using Unity.Mathematics;
@@ -10,19 +12,8 @@ namespace Camera {
     /// 角色移动
     /// </summary>
     [BurstCompile]
+    [UpdateInGroup(typeof(GameSystemGroup))]
     public partial class PlayerMovementSystem : SystemBase {
-        private KeyActionSettings _keyActionSettings;
-        private KeyActionSettings.StandardActions _standardActions;
-        protected override void OnCreate() {
-            _keyActionSettings = new KeyActionSettings();
-            _keyActionSettings.Enable();
-            _standardActions = _keyActionSettings.standard;
-        }
-
-        protected override void OnDestroy() {
-            _keyActionSettings.Dispose();
-        }
-
         [BurstCompile]
         protected override void OnUpdate() {
             Entities.WithAll<Player, Self>()
@@ -37,8 +28,8 @@ namespace Camera {
             var playerPos = new float2(0, 0);
             var cameraRotation = cameraTransform.rotation.eulerAngles;
             var currentQuaternion = Quaternion.Euler(0, cameraRotation.y, 0);
-            var leftStick = _standardActions.Move.ReadValue<Vector2>();
-            var jump = _standardActions.Jump.triggered;
+            var leftStick = InputManager.Instance.CurrentPlan.Move.ReadValue<Vector2>();
+            var jump = InputManager.Instance.CurrentPlan.Jump.triggered;
             Entities.WithAll<Player, Self>().ForEach(
                 (Entity entity, ref LocalToWorld localToWorld, ref PhysicsVelocity vel, ref PhysicsMass mass) => {
                     mass.InverseInertia.x = 0;
@@ -67,9 +58,11 @@ namespace Camera {
                 }
             ).WithoutBurst().Run();
             cameraTransform.position = cameraPos;
+            var forward = cameraTransform.forward.normalized;
             Entities.WithAll<Player, Self>()
                 .ForEach((ref Player player) => {
                     player.Pos = cameraPos;
+                    player.Forward = forward;
                 }).Run();
         }
     }
