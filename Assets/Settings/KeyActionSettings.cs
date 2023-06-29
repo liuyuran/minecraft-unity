@@ -53,6 +53,24 @@ public partial class @KeyActionSettings: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Attack"",
+                    ""type"": ""Button"",
+                    ""id"": ""0b597f4e-ebef-455b-a262-a1e2591d52a5"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Defence"",
+                    ""type"": ""Button"",
+                    ""id"": ""cfb98df5-59cf-4a8e-94b6-7ba329084f68"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -165,6 +183,50 @@ public partial class @KeyActionSettings: IInputActionCollection2, IDisposable
                     ""action"": ""Jump"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""2cce2700-3671-4934-8846-386c964d2f6a"",
+                    ""path"": ""<Mouse>/leftButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Attack"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""a181630f-cef6-42da-9d0a-9ec1d11931c1"",
+                    ""path"": ""<Gamepad>/rightTrigger"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Attack"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""d39bae10-ed77-43ce-81ac-6b74b2ed6948"",
+                    ""path"": ""<Mouse>/rightButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Defence"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""7ea2e2fa-733a-494b-b637-0c1eb9b62547"",
+                    ""path"": ""<Gamepad>/leftTrigger"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Defence"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -176,6 +238,8 @@ public partial class @KeyActionSettings: IInputActionCollection2, IDisposable
         m_standard_Move = m_standard.FindAction("Move", throwIfNotFound: true);
         m_standard_Look = m_standard.FindAction("Look", throwIfNotFound: true);
         m_standard_Jump = m_standard.FindAction("Jump", throwIfNotFound: true);
+        m_standard_Attack = m_standard.FindAction("Attack", throwIfNotFound: true);
+        m_standard_Defence = m_standard.FindAction("Defence", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -240,6 +304,8 @@ public partial class @KeyActionSettings: IInputActionCollection2, IDisposable
     private readonly InputAction m_standard_Move;
     private readonly InputAction m_standard_Look;
     private readonly InputAction m_standard_Jump;
+    private readonly InputAction m_standard_Attack;
+    private readonly InputAction m_standard_Defence;
     public struct StandardActions
     {
         private @KeyActionSettings m_Wrapper;
@@ -247,6 +313,8 @@ public partial class @KeyActionSettings: IInputActionCollection2, IDisposable
         public InputAction @Move => m_Wrapper.m_standard_Move;
         public InputAction @Look => m_Wrapper.m_standard_Look;
         public InputAction @Jump => m_Wrapper.m_standard_Jump;
+        public InputAction @Attack => m_Wrapper.m_standard_Attack;
+        public InputAction @Defence => m_Wrapper.m_standard_Defence;
         public InputActionMap Get() { return m_Wrapper.m_standard; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -265,6 +333,12 @@ public partial class @KeyActionSettings: IInputActionCollection2, IDisposable
             @Jump.started += instance.OnJump;
             @Jump.performed += instance.OnJump;
             @Jump.canceled += instance.OnJump;
+            @Attack.started += instance.OnAttack;
+            @Attack.performed += instance.OnAttack;
+            @Attack.canceled += instance.OnAttack;
+            @Defence.started += instance.OnDefence;
+            @Defence.performed += instance.OnDefence;
+            @Defence.canceled += instance.OnDefence;
         }
 
         private void UnregisterCallbacks(IStandardActions instance)
@@ -278,6 +352,12 @@ public partial class @KeyActionSettings: IInputActionCollection2, IDisposable
             @Jump.started -= instance.OnJump;
             @Jump.performed -= instance.OnJump;
             @Jump.canceled -= instance.OnJump;
+            @Attack.started -= instance.OnAttack;
+            @Attack.performed -= instance.OnAttack;
+            @Attack.canceled -= instance.OnAttack;
+            @Defence.started -= instance.OnDefence;
+            @Defence.performed -= instance.OnDefence;
+            @Defence.canceled -= instance.OnDefence;
         }
 
         public void RemoveCallbacks(IStandardActions instance)
@@ -300,5 +380,7 @@ public partial class @KeyActionSettings: IInputActionCollection2, IDisposable
         void OnMove(InputAction.CallbackContext context);
         void OnLook(InputAction.CallbackContext context);
         void OnJump(InputAction.CallbackContext context);
+        void OnAttack(InputAction.CallbackContext context);
+        void OnDefence(InputAction.CallbackContext context);
     }
 }

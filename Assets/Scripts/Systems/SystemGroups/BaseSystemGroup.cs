@@ -13,18 +13,18 @@ namespace Systems.SystemGroups {
         }
 
         protected override void OnUpdate() {
-            if (!_initialized) {
-                if (SceneManager.GetActiveScene().isLoaded) {
-                    var subScene = Object.FindFirstObjectByType<SubScene>();
-                    if (subScene != null) {
-                        Enabled = AuthoringSceneName == subScene.gameObject.scene.name;
-                    } else {
-                        Enabled = false;
-                    }
-
-                    _initialized = true;
-                }
-            }
+            // if (!_initialized) {
+            //     if (SceneManager.GetActiveScene().isLoaded) {
+            //         var subScene = Object.FindFirstObjectByType<SubScene>();
+            //         if (subScene != null) {
+            //             Enabled = AuthoringSceneName == subScene.gameObject.scene.name;
+            //         } else {
+            //             Enabled = false;
+            //         }
+            //
+            //         _initialized = true;
+            //     }
+            // }
 
             base.OnUpdate();
         }

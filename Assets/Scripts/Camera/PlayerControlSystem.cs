@@ -1,8 +1,11 @@
+using Managers;
 using Systems.SystemGroups;
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Physics;
+using Unity.Transforms;
+using UnityEngine;
 using Utils;
 
 namespace Camera {
@@ -12,11 +15,13 @@ namespace Camera {
     [BurstCompile]
     [UpdateInGroup(typeof(GameSystemGroup))]
     public partial class PlayerControlSystem : SystemBase {
-        private const int MaxControlDistance = 10;
+        private const int MaxControlDistance = 30;
         private EntityQuery _query;
 
         [BurstCompile]
         protected override void OnCreate() {
+            RequireForUpdate<Player>();
+            RequireForUpdate<Self>();
             var entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
             _query = new EntityQueryBuilder(Allocator.Temp)
                 .WithAll<Player, Self>()
@@ -28,13 +33,23 @@ namespace Camera {
             _query.Dispose();
         }
 
+        private void AttackAction(PhysicsWorldSingleton collisionWorld) {
+            var transform = CameraLink.Instance.transform;
+            var forward = transform.forward;
+            var target = RaycastUtil.Raycast(collisionWorld, transform.position + forward * 5, forward * MaxControlDistance);
+            if (target == Entity.Null) {
+                return;
+            }
+            var position = EntityManager.GetComponentData<LocalTransform>(target).Position;
+            Debug.Log($"{position.x}, {position.y}, {position.z}");
+        }
+        
         [BurstCompile]
         protected override void OnUpdate() {
             var collisionWorld = SystemAPI.GetSingleton<PhysicsWorldSingleton>();
             var player = _query.GetSingleton<Player>();
-            var target = RaycastUtil.Raycast(collisionWorld, player.Pos, player.Forward * MaxControlDistance);
-            if (target == Entity.Null) {
-                return;
+            if (InputManager.Instance.CurrentPlan.Attack.WasPressedThisFrame()) {
+                AttackAction(collisionWorld);
             }
             // TODO 绘制眼前实体的信息
             // TODO 检测按键并进行交互

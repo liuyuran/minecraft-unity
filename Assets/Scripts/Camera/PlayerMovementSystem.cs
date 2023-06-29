@@ -29,7 +29,7 @@ namespace Camera {
             var cameraRotation = cameraTransform.rotation.eulerAngles;
             var currentQuaternion = Quaternion.Euler(0, cameraRotation.y, 0);
             var leftStick = InputManager.Instance.CurrentPlan.Move.ReadValue<Vector2>();
-            var jump = InputManager.Instance.CurrentPlan.Jump.triggered;
+            var jump = InputManager.Instance.CurrentPlan.Jump.WasPressedThisFrame();
             Entities.WithAll<Player, Self>().ForEach(
                 (Entity entity, ref LocalToWorld localToWorld, ref PhysicsVelocity vel, ref PhysicsMass mass) => {
                     mass.InverseInertia.x = 0;

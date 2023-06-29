@@ -13,6 +13,8 @@ namespace Camera {
         private EntityQuery _query;
         
         public void OnCreate(ref SystemState state) {
+            state.RequireForUpdate<Player>();
+            state.RequireForUpdate<Self>();
             var entityManager = state.EntityManager;
             _query = new EntityQueryBuilder(Allocator.Temp)
                 .WithAll<Player, Self>()
