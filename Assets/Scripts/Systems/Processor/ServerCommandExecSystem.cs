@@ -1,19 +1,13 @@
-﻿using System.Collections.Generic;
-using System.Threading;
+﻿using System.Threading;
 using Base;
-using Base.Const;
 using Base.Manager;
 using Base.Messages;
 using Components;
 using Managers;
-using Systems.Jobs;
 using Systems.SystemGroups;
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
-using Unity.Jobs;
-using Unity.Mathematics;
-using UnityEngine;
 
 namespace Systems.Processor {
     /// <summary>
@@ -22,9 +16,14 @@ namespace Systems.Processor {
     [BurstCompile]
     [UpdateInGroup(typeof(GameSystemGroup))]
     public partial struct ServerCommandExecSystem : ISystem {
+        private EntityQuery _query;
+        
         public void OnCreate(ref SystemState state) {
             state.RequireForUpdate<EntityGenerator>();
             SubMeshCacheManager.Instance.GetMeshId("classic:air"); // 这里只是为了触发Instance初始化逻辑
+            _query = new EntityQueryBuilder(Allocator.Temp)
+                .WithAll<Chunk>()
+                .Build(state.EntityManager);
             new Thread(() => { Game.Start(""); }).Start();
             Thread.Sleep(1000);
             CommandTransferManager.NetworkAdapter?.SendToServer(new PlayerJoinEvent {
@@ -45,7 +44,7 @@ namespace Systems.Processor {
                 if (message == null) return;
                 switch (message) {
                     case ChunkUpdateEvent chunkUpdateEvent:
-                        GenerateChunkBlocks(ecb, prototype, chunkUpdateEvent);
+                        GenerateChunkBlocks(entityManager, ecb, prototype, chunkUpdateEvent);
                         break;
                 }
             }
