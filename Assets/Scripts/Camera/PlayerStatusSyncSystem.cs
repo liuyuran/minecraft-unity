@@ -1,4 +1,5 @@
 ﻿using Base.Manager;
+using Base.Messages;
 using Systems.SystemGroups;
 using Unity.Burst;
 using Unity.Collections;
@@ -27,7 +28,7 @@ namespace Camera {
 
         public void OnUpdate(ref SystemState state) {
             var player = _query.GetSingleton<Player>();
-            CommandTransferManager.NetworkAdapter?.UpdatePlayerInfo(new Transform {
+            CommandTransferManager.NetworkAdapter?.SendToServer(new PlayerInfoUpdateEvent {
                 Position = new Vector3(
                     player.Pos.x,
                     player.Pos.y,

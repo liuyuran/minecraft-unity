@@ -3,6 +3,7 @@ using System.Threading;
 using Base;
 using Base.Const;
 using Base.Manager;
+using Base.Messages;
 using Components;
 using Managers;
 using Systems.Jobs;
@@ -28,7 +29,9 @@ namespace Systems {
             state.RequireForUpdate<EntityGenerator>();
             new Thread(() => { Game.Start(""); }).Start();
             Thread.Sleep(1000);
-            CommandTransferManager.NetworkAdapter?.JoinGame("Kamoeth");
+            CommandTransferManager.NetworkAdapter?.SendToServer(new PlayerJoinEvent {
+                Nickname = "Kamoeth"
+            });
         }
 
         public void OnDestroy(ref SystemState state) {
@@ -36,8 +39,16 @@ namespace Systems {
         }
 
         public void OnUpdate(ref SystemState state) {
-            var chunkQueue = CommandTransferManager.NetworkAdapter?.GetChunkForUser();
-            if (chunkQueue == null || chunkQueue.Length == 0) return;
+            var chunkQueue = new List<ChunkUpdateEvent>();
+            while (CommandTransferManager.NetworkAdapter?.TryGetFromClient(out var message) ?? false) {
+                if (message == null) return;
+                switch (message) {
+                    case ChunkUpdateEvent chunkUpdateEvent:
+                        chunkQueue.Add(chunkUpdateEvent);
+                        break;
+                }
+            }
+            if (chunkQueue.Count == 0) return;
             // 下一行看似没有意义，但是必须在这里预先获取Instance对象，不然会出问题
             SubMeshCacheManager.Instance.GetMeshId("classic:air");
             var entityManager = state.EntityManager;
@@ -45,7 +56,9 @@ namespace Systems {
             // 开始刷新区块
             var prototype = GetBlockPrototype(entityManager);
             var transformArray = new List<BlockGenerateJob.BlockInfoForJob>();
-            foreach (var chunk in chunkQueue) {
+            foreach (var @event in chunkQueue) {
+                var chunk = @event.Chunk;
+                if (chunk == null) continue;
                 // TODO 如何在检测到差异之后，用相对较低的代价来更新部分方块，而不是全部？
                 var pos = new Vector3(
                     chunk.Position.X,

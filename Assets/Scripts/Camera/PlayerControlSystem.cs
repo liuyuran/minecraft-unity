@@ -4,8 +4,6 @@ using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Physics;
-using Unity.Transforms;
-using UnityEngine;
 using Utils;
 
 namespace Camera {
@@ -32,27 +30,46 @@ namespace Camera {
         protected override void OnDestroy() {
             _query.Dispose();
         }
-
-        private void AttackAction(PhysicsWorldSingleton collisionWorld) {
+        
+        /// <summary>
+        /// 获取射线碰撞的目标
+        /// </summary>
+        /// <param name="collisionWorld">物理世界</param>
+        /// <returns>屏幕中心指向的目标</returns>
+        private RaycastUtil.RaycastResult? GetRaycastTarget(PhysicsWorldSingleton collisionWorld) {
             var transform = CameraLink.Instance.transform;
             var forward = transform.forward;
-            var target = RaycastUtil.Raycast(collisionWorld, transform.position + forward * 5, forward * MaxControlDistance);
-            if (target == Entity.Null) {
-                return;
-            }
-            var position = EntityManager.GetComponentData<LocalTransform>(target).Position;
-            Debug.Log($"{position.x}, {position.y}, {position.z}");
+            // TODO 感觉这里需要优化为从屏幕中心发射射线，而不是直接读取摄像头的朝向
+            return RaycastUtil.Raycast(collisionWorld, transform.position + forward * 5, forward * MaxControlDistance);
+        }
+
+        /// <summary>
+        /// 攻击、挖掘方块
+        /// </summary>
+        /// <param name="collisionWorld">物理世界实例</param>
+        private void AttackAction(PhysicsWorldSingleton collisionWorld) {
+            var target = GetRaycastTarget(collisionWorld);
+            if (target == null) return;
+        }
+        
+        /// <summary>
+        /// 防御、放置方块
+        /// </summary>
+        /// <param name="collisionWorld"></param>
+        private void DefenceAction(PhysicsWorldSingleton collisionWorld) {
+            var target = GetRaycastTarget(collisionWorld);
+            if (target == null) return;
         }
         
         [BurstCompile]
         protected override void OnUpdate() {
             var collisionWorld = SystemAPI.GetSingleton<PhysicsWorldSingleton>();
-            var player = _query.GetSingleton<Player>();
             if (InputManager.Instance.CurrentPlan.Attack.WasPressedThisFrame()) {
                 AttackAction(collisionWorld);
             }
-            // TODO 绘制眼前实体的信息
-            // TODO 检测按键并进行交互
+            if (InputManager.Instance.CurrentPlan.Defence.WasPressedThisFrame()) {
+                DefenceAction(collisionWorld);
+            }
         }
     }
 }
