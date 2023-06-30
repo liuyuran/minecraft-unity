@@ -131,7 +131,7 @@ GameObject:
   - component: {fileID: 2065198063}
   - component: {fileID: 2065198064}
   m_Layer: 0
-  m_Name: Registry
+  m_Name: CubeRegistry
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -164,7 +164,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 484ea330856548eda0e0f076bc8b881b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  player: {fileID: 1328415620978545891, guid: 66412e62a177a404aaea0b768d85647d, type: 3}
+  player: {fileID: 5213627834737787506, guid: f62bdedabeb2eeb49a5d3d93520b585a, type: 3}
   cube: {fileID: 2948057655174179408, guid: 9e1e7c28237bc7f47ae43ad21da846d1, type: 3}
 --- !u!1001 &7150334106169131025
 PrefabInstance:
@@ -174,10 +174,20 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 2404962237936579574, guid: f62bdedabeb2eeb49a5d3d93520b585a,
+        type: 3}
+      propertyPath: m_Material.m_BelongsToCategories.m_Value.Category00
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 5213627834737787506, guid: f62bdedabeb2eeb49a5d3d93520b585a,
         type: 3}
       propertyPath: m_Name
       value: Player
+      objectReference: {fileID: 0}
+    - target: {fileID: 5501349139152353895, guid: f62bdedabeb2eeb49a5d3d93520b585a,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6285055080256139395, guid: f62bdedabeb2eeb49a5d3d93520b585a,
         type: 3}
@@ -197,7 +207,7 @@ PrefabInstance:
     - target: {fileID: 6285055080256139395, guid: f62bdedabeb2eeb49a5d3d93520b585a,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: -7.86
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6285055080256139395, guid: f62bdedabeb2eeb49a5d3d93520b585a,
         type: 3}

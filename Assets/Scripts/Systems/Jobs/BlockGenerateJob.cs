@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Security.Cryptography;
-using Components;
+﻿using Components;
 using Managers;
 using Unity.Collections;
 using Unity.Entities;
@@ -37,14 +35,14 @@ namespace Systems.Jobs {
                 Rotation = quaternion.identity,
                 Scale = 1
             });
-            Ecb.SetComponent(index, e, new Block {
-                Chunk = Data[index].ChunkPos
-            });
+            Ecb.SetComponent(index, e, new Block());
             Ecb.SetComponent(index, e, SubMeshCacheManager.Instance.GetCubeMesh(
                 Data[index].BlockId,
                 Data[index].RenderFlags
             ));
-            // LocalChunkManager.Instance.AddChunk(Data[index].ChunkPos, e);
+            Ecb.SetSharedComponent(index, e, new Chunk {
+                Pos = Data[index].ChunkPos
+            });
         }
     }
 }

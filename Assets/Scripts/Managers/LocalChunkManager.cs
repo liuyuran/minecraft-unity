@@ -1,8 +1,8 @@
-﻿using System.Collections.Concurrent;
+﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using Base.Const;
-using Unity.Entities;
 using UnityEngine;
 
 namespace Managers {
@@ -12,53 +12,40 @@ namespace Managers {
     [SuppressMessage("ReSharper", "UnusedMember.Global")]
     public class LocalChunkManager {
         public static LocalChunkManager Instance { get; } = new();
-        private readonly ConcurrentDictionary<Vector3, List<Entity>> _chunkCache = new();
+        private readonly ConcurrentDictionary<Vector3, long> _chunkVersionCache = new();
 
         private LocalChunkManager() { }
-
-        public void AddChunk(Vector3 pos, List<Entity> entities) {
-            if (_chunkCache.TryGetValue(pos, out var value)) {
-                value.AddRange(entities);
-                return;
+        
+        public void AddChunkVersion(Vector3 pos, long version) {
+            _chunkVersionCache[pos] = version;
+        }
+        
+        public long GetChunkVersion(Vector3 pos) {
+            if (!_chunkVersionCache.TryGetValue(pos, out _)) {
+                return -1;
             }
-            _chunkCache[pos] = entities;
+            return _chunkVersionCache[pos];
         }
         
-        public void AddChunk(Vector3 pos, Entity entity) {
-            if (_chunkCache.TryGetValue(pos, out var value)) {
-                value.Add(entity);
-                return;
-            }
-            _chunkCache[pos] = new List<Entity> {entity};
-        }
-        
-        public List<Entity> GetChunk(Vector3 pos) {
-            return _chunkCache[pos];
-        }
-
-        public void RemoveChunk(Vector3 pos) {
-            _chunkCache.TryRemove(pos, out _);
-        }
-        
-        private void UnloadChunk(EntityManager manager, Vector3 pos) {
-            var chunk = GetChunk(pos);
-            foreach (var entity in chunk) {
-                manager.DestroyEntity(entity);
-            }
-            RemoveChunk(pos);
-        }
-        
-        public void AutoUnloadChunk(EntityManager manager, Vector3 playerPos) {
-            var allChunks = new HashSet<Vector3>(_chunkCache.Keys);
-            for (var x = -ParamConst.DisplayDistance; x <= ParamConst.DisplayDistance; x++) {
-                for (var y = -ParamConst.DisplayDistance; y <= ParamConst.DisplayDistance; y++) {
-                    for (var z = -ParamConst.DisplayDistance; z <= ParamConst.DisplayDistance; z++) {
-                        allChunks.Remove(playerPos + new Vector3(x, y, z));
+        public HashSet<Vector3> AutoUnloadChunk(Vector3 playerPos) {
+            var position = playerPos + new Vector3();
+            position.x = (float)Math.Round(position.x / ParamConst.ChunkSize);
+            position.y = (float)Math.Round(position.y / ParamConst.ChunkSize);
+            position.z = (float)Math.Round(position.z / ParamConst.ChunkSize);
+            var allChunks = new HashSet<Vector3>(_chunkVersionCache.Keys);
+            for (var x = -ParamConst.DisplayDistance - 1; x <= ParamConst.DisplayDistance + 1; x++) {
+                for (var y = -ParamConst.DisplayDistance - 1; y <= ParamConst.DisplayDistance + 1; y++) {
+                    for (var z = -ParamConst.DisplayDistance - 1; z <= ParamConst.DisplayDistance + 1; z++) {
+                        allChunks.Remove(position + new Vector3(x, y, z));
                     }
                 }
             }
-            foreach (var pos in allChunks) {
-                UnloadChunk(manager, pos);
+            return allChunks;
+        }
+        
+        public void RemoveChunks(HashSet<Vector3> chunks) {
+            foreach (var chunk in chunks) {
+                _chunkVersionCache.Remove(chunk, out _);
             }
         }
     }

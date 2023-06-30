@@ -18,8 +18,9 @@ namespace Managers {
             var hybridRenderer = World.DefaultGameObjectInjectionWorld.GetExistingSystemManaged<EntitiesGraphicsSystem>();
             const int max = Chunk.Up | Chunk.Down | Chunk.Left | Chunk.Right | Chunk.Front | Chunk.Back;
             var blocks = BlockTypeManager.Instance.GetBlockIds();
-            var material = hybridRenderer.RegisterMaterial(new Material(Shader.Find("Universal Render Pipeline/Lit")) {
-                mainTexture = BlockTypeManager.Instance.GetMergedTexture()
+            var materialID = hybridRenderer.RegisterMaterial(new Material(Shader.Find("Universal Render Pipeline/Lit")) {
+                mainTexture = BlockTypeManager.Instance.GetMergedTexture(),
+                enableInstancing = true
             });
             for (var i = 0; i < max + 1; i++) {
                 for (var index = 0; index < blocks.Length; index++) {
@@ -30,7 +31,7 @@ namespace Managers {
                     ApplyUV(mesh, blockId, i);
                     var meshID = hybridRenderer.RegisterMesh(mesh);
                     _meshPrefabs.Add($"cube:{blockId}:{i}", new MaterialMeshInfo {
-                        Material = (int)material.value,
+                        Material = (int)materialID.value,
                         Mesh = (int)meshID.value
                     });
                     if (i == max && index == 0) {
