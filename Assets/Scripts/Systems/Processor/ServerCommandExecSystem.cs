@@ -20,7 +20,6 @@ namespace Systems.Processor {
         
         public void OnCreate(ref SystemState state) {
             state.RequireForUpdate<EntityGenerator>();
-            SubMeshCacheManager.Instance.GetMeshId("classic:air"); // 这里只是为了触发Instance初始化逻辑
             _query = new EntityQueryBuilder(Allocator.Temp)
                 .WithAll<Chunk>()
                 .Build(state.EntityManager);
@@ -36,11 +35,12 @@ namespace Systems.Processor {
         }
 
         public void OnUpdate(ref SystemState state) {
+            SubMeshCacheManager.Instance.GetMeshId("classic:air"); // 这里只是为了触发Instance初始化逻辑
             var entityManager = state.EntityManager;
             var ecb = new EntityCommandBuffer(Allocator.TempJob);
             // 开始刷新区块
             var prototype = GetBlockPrototype(entityManager);
-            while (CommandTransferManager.NetworkAdapter?.TryGetFromClient(out var message) ?? false) {
+            while (CommandTransferManager.NetworkAdapter?.TryGetFromServer(out var message) ?? false) {
                 if (message == null) return;
                 switch (message) {
                     case ChunkUpdateEvent chunkUpdateEvent:
