@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Base.Blocks;
 using Exceptions;
 using UnityEngine;
 using UnityEngine.Windows;
@@ -14,7 +15,8 @@ namespace Managers {
     /// </summary>
     public class BlockTypeManager {
         public static BlockTypeManager Instance { get; } = new();
-        private int _textureSize = 512;
+        private int _textureSize = 64;
+        private const int Padding = 2;
         private int _totalWidth;
         private int _totalHeight;
         private readonly Dictionary<string, Type> _blockLink = new();
@@ -55,7 +57,11 @@ namespace Managers {
             if (_blockLink.ContainsKey(blockId)) throw new DuplicateBlockIdException(blockId);
             _blockLink.Add(blockId, obj.GetType());
             var byteArray = File.ReadAllBytes($"{Application.dataPath}/Texture/{obj.Texture}");
-            var texture = new Texture2D(_textureSize, _textureSize);
+            var texture = new Texture2D(_textureSize, _textureSize, TextureFormat.RGBA32, false) {
+                filterMode = FilterMode.Point,
+                wrapMode = TextureWrapMode.Repeat,
+                alphaIsTransparency = true
+            };
             var isLoaded = texture.LoadImage(byteArray);
             if (!isLoaded) throw new TextureLoadFailedException(blockId, obj.Texture);
             _textureLink.Add(blockId, texture);
@@ -66,6 +72,12 @@ namespace Managers {
                 x = baseVec.x + offset.x * baseVec.width,
                 y = baseVec.y + offset.y * baseVec.height
             };
+            if (uvOffset.x > baseVec.x + baseVec.width) {
+                uvOffset.x = baseVec.x + baseVec.width;
+            }
+            if (uvOffset.y > baseVec.y + baseVec.height) {
+                uvOffset.y = baseVec.y + baseVec.height;
+            }
             return uvOffset;
         }
 
@@ -92,13 +104,13 @@ namespace Managers {
                     uvs[2] = new Vector2(0.333f, 0.5f);
                     uvs[3] = new Vector2(0.333f, 0.0f);
                     break;
-                case Direction.east:
+                case Direction.east: // right
                     uvs[0] = new Vector2(0.667f, 0.5f);
                     uvs[1] = new Vector2(0.667f, 1.0f);
                     uvs[2] = new Vector2(1.0f, 1.0f);
                     uvs[3] = new Vector2(1.0f, 0.5f);
                     break;
-                case Direction.west:
+                case Direction.west: // left
                     uvs[0] = new Vector2(0.334f, 0.5f);
                     uvs[1] = new Vector2(0.334f, 1.0f);
                     uvs[2] = new Vector2(0.666f, 1.0f);
@@ -139,8 +151,8 @@ namespace Managers {
             Dictionary<string, int> textureIndex = new();
             const int width = 1;
             var height = (int) Math.Ceiling((double) _textureLink.Count / width);
-            _totalWidth = width * _textureSize;
-            _totalHeight = height * _textureSize;
+            _totalWidth = width * (_textureSize + Padding * 2);
+            _totalHeight = height * (_textureSize + Padding * 2);
             var texture2Ds = new Texture2D[_textureLink.Count];
             var index = 0;
             foreach (var (key, value) in _textureLink) {
@@ -153,7 +165,7 @@ namespace Managers {
             _textureLink.Clear();
             _bigTexture = new Texture2D(_totalWidth, _totalHeight);
             // 合成
-            var rects = _bigTexture.PackTextures(texture2Ds, 0, width * _textureSize);
+            var rects = _bigTexture.PackTextures(texture2Ds, Padding, width * (_textureSize + Padding * 2));
             // 下面的算法我猜的，在面积足够的前提下，unity不会进行贴图压缩，所以保留关键的x、y偏移量即可
             foreach (var (key, value) in textureIndex) {
                 if (rects.Length <= value) continue;

@@ -35,7 +35,7 @@ namespace Systems.Processor {
         }
 
         public void OnUpdate(ref SystemState state) {
-            SubMeshCacheManager.Instance.GetMeshId("classic:air"); // 这里只是为了触发Instance初始化逻辑
+            SubMeshCacheManager.Instance.GetMeshId("classic:dirt"); // 这里只是为了触发Instance初始化逻辑
             var entityManager = state.EntityManager;
             var ecb = new EntityCommandBuffer(Allocator.TempJob);
             // 开始刷新区块
