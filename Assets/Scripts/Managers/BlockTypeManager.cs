@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Base.Blocks;
 using Exceptions;
 using UnityEngine;
 using UnityEngine.Windows;
@@ -14,7 +15,7 @@ namespace Managers {
     /// </summary>
     public class BlockTypeManager {
         public static BlockTypeManager Instance { get; } = new();
-        private int _textureSize = 512;
+        private int _textureSize = 16;
         private int _totalWidth;
         private int _totalHeight;
         private readonly Dictionary<string, Type> _blockLink = new();
@@ -55,7 +56,9 @@ namespace Managers {
             if (_blockLink.ContainsKey(blockId)) throw new DuplicateBlockIdException(blockId);
             _blockLink.Add(blockId, obj.GetType());
             var byteArray = File.ReadAllBytes($"{Application.dataPath}/Texture/{obj.Texture}");
-            var texture = new Texture2D(_textureSize, _textureSize);
+            var texture = new Texture2D(_textureSize, _textureSize) {
+                filterMode = FilterMode.Point
+            };
             var isLoaded = texture.LoadImage(byteArray);
             if (!isLoaded) throw new TextureLoadFailedException(blockId, obj.Texture);
             _textureLink.Add(blockId, texture);
@@ -66,6 +69,12 @@ namespace Managers {
                 x = baseVec.x + offset.x * baseVec.width,
                 y = baseVec.y + offset.y * baseVec.height
             };
+            if (uvOffset.x > baseVec.x + baseVec.width) {
+                uvOffset.x = baseVec.x + baseVec.width;
+            }
+            if (uvOffset.y > baseVec.y + baseVec.height) {
+                uvOffset.y = baseVec.y + baseVec.height;
+            }
             return uvOffset;
         }
 
@@ -92,13 +101,13 @@ namespace Managers {
                     uvs[2] = new Vector2(0.333f, 0.5f);
                     uvs[3] = new Vector2(0.333f, 0.0f);
                     break;
-                case Direction.east:
+                case Direction.east: // right
                     uvs[0] = new Vector2(0.667f, 0.5f);
                     uvs[1] = new Vector2(0.667f, 1.0f);
                     uvs[2] = new Vector2(1.0f, 1.0f);
                     uvs[3] = new Vector2(1.0f, 0.5f);
                     break;
-                case Direction.west:
+                case Direction.west: // left
                     uvs[0] = new Vector2(0.334f, 0.5f);
                     uvs[1] = new Vector2(0.334f, 1.0f);
                     uvs[2] = new Vector2(0.666f, 1.0f);
