@@ -18,10 +18,11 @@ namespace Managers {
             var hybridRenderer = World.DefaultGameObjectInjectionWorld.GetExistingSystemManaged<EntitiesGraphicsSystem>();
             const int max = Chunk.Up | Chunk.Down | Chunk.Left | Chunk.Right | Chunk.Front | Chunk.Back;
             var blocks = BlockTypeManager.Instance.GetBlockIds();
-            var materialID = hybridRenderer.RegisterMaterial(new Material(Shader.Find("Universal Render Pipeline/Lit")) {
+            var material = new Material(Shader.Find("Universal Render Pipeline/Lit")) {
                 mainTexture = BlockTypeManager.Instance.GetMergedTexture(),
-                enableInstancing = true
-            });
+                enableInstancing = true,
+            };
+            var materialID = hybridRenderer.RegisterMaterial(material);
             for (var i = 0; i < max + 1; i++) {
                 for (var index = 0; index < blocks.Length; index++) {
                     var blockId = blocks[index];
