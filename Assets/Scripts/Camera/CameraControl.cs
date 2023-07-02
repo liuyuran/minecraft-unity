@@ -33,6 +33,8 @@ namespace Camera {
             var rightStick = _standardActions.Look.ReadValue<Vector2>();
             _yaw += lookSpeedH * rightStick.x;
             _pitch -= lookSpeedV * rightStick.y;
+            _yaw = Mathf.Repeat(_yaw, 360f);
+            _pitch = Mathf.Clamp(_pitch, -90, 90);
             transform.eulerAngles = new Vector3(_pitch, _yaw, 0f);
         }
     }
