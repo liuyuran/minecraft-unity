@@ -4,6 +4,7 @@ using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Physics;
+using UnityEngine;
 using Utils;
 
 namespace Camera {
@@ -13,7 +14,7 @@ namespace Camera {
     [BurstCompile]
     [UpdateInGroup(typeof(GameSystemGroup))]
     public partial class PlayerControlSystem : SystemBase {
-        private const int MaxControlDistance = 30;
+        private const int MaxControlDistance = 4;
         private EntityQuery _query;
 
         [BurstCompile]
@@ -37,10 +38,12 @@ namespace Camera {
         /// <param name="collisionWorld">物理世界</param>
         /// <returns>屏幕中心指向的目标</returns>
         private RaycastUtil.RaycastResult? GetRaycastTarget(PhysicsWorldSingleton collisionWorld) {
-            var transform = CameraLink.Instance.transform;
-            var forward = transform.forward;
-            // TODO 感觉这里需要优化为从屏幕中心发射射线，而不是直接读取摄像头的朝向
-            return RaycastUtil.Raycast(collisionWorld, transform.position + forward * 5, forward * MaxControlDistance);
+            var center = new Vector3(Screen.width / 2, Screen.height / 2, 1);
+            var pointA = CameraLink.Instance.ScreenToWorldPoint(center);
+            center.z = MaxControlDistance;
+            var pointB = CameraLink.Instance.ScreenToWorldPoint(center) - pointA;
+            Debug.DrawRay(pointA, pointB, Color.red, 10);
+            return RaycastUtil.Raycast(collisionWorld, pointA - pointB * 0.5f, pointB.normalized * MaxControlDistance + pointA);
         }
 
         /// <summary>
@@ -50,6 +53,8 @@ namespace Camera {
         private void AttackAction(PhysicsWorldSingleton collisionWorld) {
             var target = GetRaycastTarget(collisionWorld);
             if (target == null) return;
+            var entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
+            entityManager.DestroyEntity(target.Value.Entity);
         }
         
         /// <summary>

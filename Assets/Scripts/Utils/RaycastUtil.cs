@@ -1,6 +1,7 @@
 ﻿using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Physics;
+using Unity.Physics.Systems;
 using UnityEngine;
 
 namespace Utils {
@@ -27,8 +28,8 @@ namespace Utils {
                 End = rayTo,
                 Filter = new CollisionFilter {
                     BelongsTo = ~(1u << 0), // 这里的意思是排除0层的刚体，~的意思是按位取反，<<是二进制左移，其最终值应该是按二进制位读取的
-                    CollidesWith = ~0u, // 这个参数和editor中同名参数含义类似，应该是说参与物理碰撞检测的层，但是我不懂，如果这也可以排除，那不就穿模了？
-                    GroupIndex = 0
+                    CollidesWith = 1u << 0, // 这个参数和editor中同名参数含义类似，但这里的值实际测试中必须是BelongsTo的按位取反，不明白为什么
+                    GroupIndex = 0 // 意义不明，暂且写0
                 }
             };
             var haveHit = world.CastRay(input, out var hit);
