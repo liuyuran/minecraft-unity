@@ -63,7 +63,7 @@ namespace Camera {
                 ChunkPos = new System.Numerics.Vector3(chunkPos.x, chunkPos.y, chunkPos.z),
                 BlockPos = new System.Numerics.Vector3(blockPos.x, blockPos.y, blockPos.z),
                 ActionType = BlockUpdateEvent.ActionTypeEnum.Dig,
-                Operand = target.Value.Direction.ToString()
+                Direction = target.Value.Direction
             });
         }
         
@@ -81,7 +81,7 @@ namespace Camera {
                 ChunkPos = new System.Numerics.Vector3(chunkPos.x, chunkPos.y, chunkPos.z),
                 BlockPos = new System.Numerics.Vector3(blockPos.x, blockPos.y, blockPos.z),
                 ActionType = BlockUpdateEvent.ActionTypeEnum.Action,
-                Operand = target.Value.Direction.ToString()
+                Direction = target.Value.Direction
             });
         }
         
