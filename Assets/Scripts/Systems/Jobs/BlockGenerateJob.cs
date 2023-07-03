@@ -18,9 +18,7 @@ namespace Systems.Jobs {
         }
 
         public Entity Prototype;
-
         public EntityCommandBuffer.ParallelWriter Ecb;
-
         // 貌似这里只能用只读数组
         [ReadOnly] public NativeArray<BlockInfoForJob> Data;
 
@@ -38,13 +36,14 @@ namespace Systems.Jobs {
             Ecb.SetComponent(index, e, new Block {
                 Pos = Data[index].Pos
             });
+            Ecb.SetSharedComponent(index, e, new Chunk {
+                Pos = Data[index].ChunkPos
+            });
+            // TODO Raycast问题的原因就是下面这句，可是这一句又是贴图和显示剔除优化的核心代码……怎么办呢？
             Ecb.SetComponent(index, e, SubMeshCacheManager.Instance.GetCubeMesh(
                 Data[index].BlockId,
                 Data[index].RenderFlags
             ));
-            Ecb.SetSharedComponent(index, e, new Chunk {
-                Pos = Data[index].ChunkPos
-            });
         }
     }
 }

@@ -33,9 +33,9 @@ namespace Utils {
             };
             var haveHit = world.CastRay(input, out var hit);
             if (haveHit)
-                Debug.DrawLine(rayFrom, hit.Position, Color.red);
+                Debug.DrawLine(rayFrom, hit.Position, Color.red, 30);
             else
-                Debug.DrawLine(rayFrom, rayTo, Color.green);
+                Debug.DrawLine(rayFrom, rayTo, Color.green, 30);
             var direction = Direction.up;
             if (Vector3.Dot(hit.SurfaceNormal, Vector3.up) > 0.9f) {
                 direction = Direction.up;
