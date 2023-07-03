@@ -1,3 +1,6 @@
+using Base.Manager;
+using Base.Messages;
+using Components;
 using Managers;
 using Systems.SystemGroups;
 using Unity.Burst;
@@ -6,6 +9,7 @@ using Unity.Entities;
 using Unity.Physics;
 using UnityEngine;
 using Utils;
+using Block = Components.Block;
 
 namespace Camera {
     /// <summary>
@@ -42,7 +46,6 @@ namespace Camera {
             var pointA = CameraLink.Instance.ScreenToWorldPoint(center);
             center.z = MaxControlDistance;
             var pointB = CameraLink.Instance.ScreenToWorldPoint(center) - pointA;
-            Debug.DrawRay(pointA, pointB, Color.red, 10);
             return RaycastUtil.Raycast(collisionWorld, pointA - pointB * 0.5f, pointB.normalized * MaxControlDistance + pointA);
         }
 
@@ -54,7 +57,14 @@ namespace Camera {
             var target = GetRaycastTarget(collisionWorld);
             if (target == null) return;
             var entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
-            entityManager.DestroyEntity(target.Value.Entity);
+            var chunkPos = entityManager.GetSharedComponent<Chunk>(target.Value.Entity).Pos;
+            var blockPos = entityManager.GetComponentData<Block>(target.Value.Entity).Pos;
+            CommandTransferManager.NetworkAdapter?.SendToServer(new BlockUpdateEvent {
+                ChunkPos = new System.Numerics.Vector3(chunkPos.x, chunkPos.y, chunkPos.z),
+                BlockPos = new System.Numerics.Vector3(blockPos.x, blockPos.y, blockPos.z),
+                ActionType = BlockUpdateEvent.ActionTypeEnum.Dig,
+                Operand = target.Value.Direction.ToString()
+            });
         }
         
         /// <summary>
@@ -64,6 +74,15 @@ namespace Camera {
         private void DefenceAction(PhysicsWorldSingleton collisionWorld) {
             var target = GetRaycastTarget(collisionWorld);
             if (target == null) return;
+            var entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
+            var chunkPos = entityManager.GetSharedComponent<Chunk>(target.Value.Entity).Pos;
+            var blockPos = entityManager.GetComponentData<Block>(target.Value.Entity).Pos;
+            CommandTransferManager.NetworkAdapter?.SendToServer(new BlockUpdateEvent {
+                ChunkPos = new System.Numerics.Vector3(chunkPos.x, chunkPos.y, chunkPos.z),
+                BlockPos = new System.Numerics.Vector3(blockPos.x, blockPos.y, blockPos.z),
+                ActionType = BlockUpdateEvent.ActionTypeEnum.Action,
+                Operand = target.Value.Direction.ToString()
+            });
         }
         
         [BurstCompile]

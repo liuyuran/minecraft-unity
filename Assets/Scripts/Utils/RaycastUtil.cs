@@ -1,8 +1,8 @@
-﻿using Unity.Entities;
+﻿using Base.Utils;
 using Unity.Mathematics;
 using Unity.Physics;
-using Unity.Physics.Systems;
 using UnityEngine;
+using Entity = Unity.Entities.Entity;
 
 namespace Utils {
     /// <summary>
@@ -16,7 +16,6 @@ namespace Utils {
 
         /// <summary>
         /// 射线检测，指定一条三维有向线段，返回碰撞到的最近的实体
-        /// TODO 待验证，只是理论上可行
         /// </summary>
         /// <param name="world">物理世界实例</param>
         /// <param name="rayFrom">线段起点</param>
@@ -33,6 +32,10 @@ namespace Utils {
                 }
             };
             var haveHit = world.CastRay(input, out var hit);
+            if (haveHit)
+                Debug.DrawLine(rayFrom, hit.Position, Color.red);
+            else
+                Debug.DrawLine(rayFrom, rayTo, Color.green);
             var direction = Direction.up;
             if (Vector3.Dot(hit.SurfaceNormal, Vector3.up) > 0.9f) {
                 direction = Direction.up;

@@ -35,7 +35,9 @@ namespace Systems.Jobs {
                 Rotation = quaternion.identity,
                 Scale = 1
             });
-            Ecb.SetComponent(index, e, new Block());
+            Ecb.SetComponent(index, e, new Block {
+                Pos = Data[index].Pos
+            });
             Ecb.SetComponent(index, e, SubMeshCacheManager.Instance.GetCubeMesh(
                 Data[index].BlockId,
                 Data[index].RenderFlags
