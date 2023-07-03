@@ -1,10 +1,9 @@
-﻿using Base.Manager;
-using Base.Messages;
+﻿using Base.Events;
+using Base.Manager;
 using Systems.SystemGroups;
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
-using Transform = Base.Components.Transform;
 using Vector3 = System.Numerics.Vector3;
 
 namespace Camera {
