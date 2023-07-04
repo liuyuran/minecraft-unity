@@ -7,9 +7,11 @@ namespace Camera {
         public Vector3 Forward;
     }
 
-    public struct Self : IComponentData { }
+    public struct Self : IComponentData {
+        public int WorldId;
+    }
 
-    public class PlayerAuthoring : UnityEngine.MonoBehaviour {
+    public class PlayerAuthoring : MonoBehaviour {
         public class PlayerBaker : Baker<PlayerAuthoring> {
             public override void Bake(PlayerAuthoring authoring) {
                 var entity = GetEntity(TransformUsageFlags.Dynamic);

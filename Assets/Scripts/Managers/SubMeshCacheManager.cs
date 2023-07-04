@@ -4,7 +4,6 @@ using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Rendering;
 using UnityEngine;
-using Utils;
 
 namespace Managers {
     public class SubMeshCacheManager {

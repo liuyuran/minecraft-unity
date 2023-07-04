@@ -8,6 +8,7 @@ using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
 using Unity.Mathematics;
+using Unity.Physics;
 using Unity.Rendering;
 using UnityEngine;
 using Entity = Unity.Entities.Entity;
@@ -36,7 +37,9 @@ namespace Systems.Processor {
                 chunk.Position.Z
             );
             if (chunk.Version == LocalChunkManager.Instance.GetChunkVersion(pos)) return;
-            if (LocalChunkManager.Instance.GetChunkVersion(pos) == -1) {
+            var chunkExist = LocalChunkManager.Instance.GetChunkVersion(pos) == -1;
+            if (!chunkExist && chunk.IsEmpty) return;
+            if (chunkExist) {
                 // 区块尚未生成
                 var transformArray = new List<BlockGenerateJob.BlockInfoForJob>();
                 for (var x = 0; x < ParamConst.ChunkSize; x++) {
@@ -67,6 +70,7 @@ namespace Systems.Processor {
 
                 var job = new BlockGenerateJob {
                     Prototype = prototype,
+                    WorldId = chunk.WorldId,
                     Ecb = ecb.AsParallelWriter(),
                     Data = cubes
                 };

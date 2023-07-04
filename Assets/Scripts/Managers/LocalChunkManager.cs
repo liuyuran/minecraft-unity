@@ -8,6 +8,7 @@ using UnityEngine;
 namespace Managers {
     /// <summary>
     /// 用于快速索引归属于一个Chunk的方块
+    /// 由于这里的数据和游戏世界高度关联，所以不需要引入WorldId的概念
     /// </summary>
     [SuppressMessage("ReSharper", "UnusedMember.Global")]
     public class LocalChunkManager {
@@ -47,6 +48,10 @@ namespace Managers {
             foreach (var chunk in chunks) {
                 _chunkVersionCache.Remove(chunk, out _);
             }
+        }
+        
+        public void Clear() {
+            _chunkVersionCache.Clear();
         }
     }
 }

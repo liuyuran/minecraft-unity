@@ -1,4 +1,5 @@
-﻿using Components;
+﻿using Camera;
+using Components;
 using Managers;
 using Unity.Collections;
 using Unity.Entities;
@@ -18,6 +19,7 @@ namespace Systems.Jobs {
         }
 
         public Entity Prototype;
+        public int WorldId;
         public EntityCommandBuffer.ParallelWriter Ecb;
         // 貌似这里只能用只读数组
         [ReadOnly] public NativeArray<BlockInfoForJob> Data;
@@ -32,6 +34,9 @@ namespace Systems.Jobs {
                 Position = Data[index].Pos,
                 Rotation = quaternion.identity,
                 Scale = 1
+            });
+            Ecb.SetComponent(index, e, new Self {
+                WorldId = WorldId
             });
             Ecb.SetComponent(index, e, new Block {
                 Pos = Data[index].Pos
