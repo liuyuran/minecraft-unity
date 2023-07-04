@@ -8,7 +8,6 @@ using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
 using Unity.Mathematics;
-using Unity.Physics;
 using Unity.Rendering;
 using UnityEngine;
 using Entity = Unity.Entities.Entity;
@@ -70,7 +69,6 @@ namespace Systems.Processor {
 
                 var job = new BlockGenerateJob {
                     Prototype = prototype,
-                    WorldId = chunk.WorldId,
                     Ecb = ecb.AsParallelWriter(),
                     Data = cubes
                 };
