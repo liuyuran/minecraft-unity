@@ -8,6 +8,7 @@ using Systems.SystemGroups;
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
+using Utils;
 
 namespace Systems.Processor {
     /// <summary>
@@ -23,6 +24,7 @@ namespace Systems.Processor {
             _query = new EntityQueryBuilder(Allocator.Temp)
                 .WithAll<Chunk>()
                 .Build(state.EntityManager);
+            UnitySystemConsoleRedirect.Redirect();
             new Thread(() => { Game.Start(""); }).Start();
             Thread.Sleep(1000);
             CommandTransferManager.NetworkAdapter?.SendToServer(new PlayerJoinEvent {
@@ -48,6 +50,7 @@ namespace Systems.Processor {
                         break;
                 }
             }
+            
             ecb.Playback(entityManager);
             ecb.Dispose();
         }

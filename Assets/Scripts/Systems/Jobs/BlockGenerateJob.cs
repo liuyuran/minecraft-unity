@@ -11,6 +11,7 @@ using Entity = Unity.Entities.Entity;
 namespace Systems.Jobs {
     public struct BlockGenerateJob : IJobParallelFor {
         public struct BlockInfoForJob {
+            public int WorldId;
             public int BlockId;
             public float3 Pos;
             public int RenderFlags;
@@ -38,6 +39,9 @@ namespace Systems.Jobs {
             });
             Ecb.SetSharedComponent(index, e, new Chunk {
                 Pos = Data[index].ChunkPos
+            });
+            Ecb.SetSharedComponent(index, e, new GameWorld {
+                WorldId = Data[index].WorldId
             });
             Ecb.SetComponent(index, e, SubMeshCacheManager.Instance.GetCubeMesh(
                 Data[index].BlockId,

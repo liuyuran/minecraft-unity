@@ -21,6 +21,7 @@ namespace Systems.Processor {
             if (entityManager.HasComponent<Block>(cube)) return cube;
             entityManager.AddComponent<Block>(cube);
             entityManager.AddComponent<Chunk>(cube);
+            entityManager.AddComponent<GameWorld>(cube);
             entityManager.AddComponentData(cube,new RenderBounds { Value = SubMeshCacheManager.Instance.RenderEdge });
             return cube;
         }
@@ -54,7 +55,8 @@ namespace Systems.Processor {
                                     z + pos.z * ParamConst.ChunkSize
                                 ),
                                 RenderFlags = block.RenderFlags,
-                                ChunkPos = pos
+                                ChunkPos = pos,
+                                WorldId = chunk.WorldId
                             });
                         }
                     }
@@ -80,16 +82,26 @@ namespace Systems.Processor {
                 _query.SetSharedComponentFilterManaged(new Chunk {
                     Pos = pos
                 });
+                _query.SetSharedComponentFilterManaged(new GameWorld {
+                    WorldId = chunk.WorldId
+                });
                 var entities = _query.ToEntityArray(Allocator.TempJob);
+                var entityMap = new Dictionary<Vector3, Entity>();
+                foreach (var entity in entities) {
+                    var block = entityManager.GetComponentData<Block>(entity);
+                    entityMap.Add(block.Pos, entity);
+                }
                 var job = new BlockUpdateJob {
                     Ecb = ecb.AsParallelWriter(),
                     EntityData = entities,
+                    BlockEntities = entityMap,
                     Chunk = chunk
                 };
                 var task = job.Schedule(ParamConst.ChunkSize * ParamConst.ChunkSize * ParamConst.ChunkSize, 256);
                 task.Complete();
                 _query.ResetFilter();
                 entities.Dispose();
+                LocalChunkManager.Instance.AddChunkVersion(pos, chunk.Version);
             }
         } 
     }
