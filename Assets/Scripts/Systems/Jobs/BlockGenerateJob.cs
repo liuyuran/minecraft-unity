@@ -39,7 +39,6 @@ namespace Systems.Jobs {
             Ecb.SetSharedComponent(index, e, new Chunk {
                 Pos = Data[index].ChunkPos
             });
-            // TODO Raycast问题的原因就是下面这句，可是这一句又是贴图和显示剔除优化的核心代码……怎么办呢？
             Ecb.SetComponent(index, e, SubMeshCacheManager.Instance.GetCubeMesh(
                 Data[index].BlockId,
                 Data[index].RenderFlags

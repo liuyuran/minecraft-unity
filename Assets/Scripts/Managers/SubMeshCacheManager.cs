@@ -9,10 +9,13 @@ using UnityEngine;
 using Material = UnityEngine.Material;
 
 namespace Managers {
+    /// <summary>
+    /// 用于预先生成虚拟方块模型及其配套的贴图、渲染边界、碰撞体等数据的管理器
+    /// </summary>
     public class SubMeshCacheManager {
         public static SubMeshCacheManager Instance { get; } = new();
-        public readonly AABB RenderEdge;
-        public readonly PhysicsCollider Collider;
+        public readonly AABB RenderEdge; // 通用方块渲染边界，决定Camera在特定视角下的剔除范围
+        public readonly PhysicsCollider Collider; // 通用方块碰撞体，用于正确激活Raycast
         private readonly Dictionary<int, string> _meshCache = new();
         private readonly Dictionary<string, int> _meshCacheRev = new();
         private readonly Dictionary<string, MaterialMeshInfo> _meshPrefabs = new();
@@ -46,6 +49,12 @@ namespace Managers {
             }
         }
 
+        /// <summary>
+        /// 根据已生成的Mesh生成Collider
+        /// 其实有更高效的unsafe内存拷贝方法，但是unsafe关键字的污染性太强了，还是不要用
+        /// </summary>
+        /// <param name="mesh">Mesh对象</param>
+        /// <returns>Collider对象</returns>
         private static PhysicsCollider GenerateCollider(Mesh mesh) {
             NativeArray<float3> meshVertices;
             NativeArray<int3> meshTris;
@@ -66,6 +75,11 @@ namespace Managers {
             }
         }
 
+        /// <summary>
+        /// 根据渲染标记生成特殊Mesh
+        /// </summary>
+        /// <param name="renderFlag">按位运算出来的渲染标记</param>
+        /// <returns>Mesh对象</returns>
         private static Mesh GenerateCubeMeshInfo(int renderFlag) {
             var vertices = new List<Vector3>();
             var triangles = new List<int>();
@@ -178,6 +192,12 @@ namespace Managers {
             return mesh;
         }
 
+        /// <summary>
+        /// 将UV信息应用到Mesh上
+        /// </summary>
+        /// <param name="mesh">Mesh对象</param>
+        /// <param name="blockId">方块ID</param>
+        /// <param name="renderFlag">渲染标记</param>
         private static void ApplyUV(Mesh mesh, string blockId, int renderFlag) {
             var uvs = new List<Vector2>();
             if ((renderFlag & Chunk.Up) > 0) {
@@ -208,10 +228,21 @@ namespace Managers {
             mesh.RecalculateNormals();
         }
 
+        /// <summary>
+        /// 获取覆写材质和顶点信息所需的Component对象
+        /// </summary>
+        /// <param name="blockId">方块ID</param>
+        /// <param name="renderFlag">渲染标记</param>
+        /// <returns>记载模型顶点信息和材质信息的Component</returns>
         public MaterialMeshInfo GetCubeMesh(int blockId, int renderFlag) {
             return _meshPrefabs[$"cube:{_meshCache[blockId]}:{renderFlag}"];
         }
 
+        /// <summary>
+        /// 用于转换字符串版本和数字版本的方块ID
+        /// </summary>
+        /// <param name="blockId">字符串版本方块ID</param>
+        /// <returns>数字版本的方块ID</returns>
         public int GetMeshId(string blockId) {
             return _meshCacheRev[blockId];
         }
