@@ -82,9 +82,6 @@ namespace Systems.Processor {
                 _query.SetSharedComponentFilterManaged(new Chunk {
                     Pos = pos
                 });
-                _query.SetSharedComponentFilterManaged(new GameWorld {
-                    WorldId = chunk.WorldId
-                });
                 var entities = _query.ToEntityArray(Allocator.TempJob);
                 var entityMap = new Dictionary<Vector3, Entity>();
                 foreach (var entity in entities) {

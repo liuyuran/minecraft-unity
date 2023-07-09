@@ -2,12 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using Base.Blocks;
 using Base.Utils;
 using Exceptions;
 using UnityEngine;
 using UnityEngine.Windows;
-using Utils;
 using Block = Base.Blocks.Block;
 
 namespace Managers {
@@ -57,11 +55,14 @@ namespace Managers {
             var blockId = obj.ID;
             if (_blockLink.ContainsKey(blockId)) throw new DuplicateBlockIdException(blockId);
             _blockLink.Add(blockId, obj.GetType());
-            var byteArray = File.ReadAllBytes($"{Application.dataPath}/Texture/{obj.Texture}");
+#if UNITY_WINRT
+            var byteArray = UnityEngine.Windows.File.ReadAllBytes($"{Application.dataPath}/Texture/{obj.Texture}");
+#else
+            var byteArray = System.IO.File.ReadAllBytes($"{Application.dataPath}/Texture/{obj.Texture}");
+#endif
             var texture = new Texture2D(_textureSize, _textureSize, TextureFormat.RGBA32, false) {
                 filterMode = FilterMode.Point,
-                wrapMode = TextureWrapMode.Repeat,
-                alphaIsTransparency = true
+                wrapMode = TextureWrapMode.Repeat
             };
             var isLoaded = texture.LoadImage(byteArray);
             if (!isLoaded) throw new TextureLoadFailedException(blockId, obj.Texture);

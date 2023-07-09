@@ -78,13 +78,13 @@ namespace Camera {
             if (target == null) return;
             var entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
             var chunkPos = entityManager.GetSharedComponent<Chunk>(target.Value.Entity).Pos;
-            var worldId = entityManager.GetComponentData<Self>(target.Value.Entity).WorldId;
+            var worldId = entityManager.GetSharedComponent<GameWorld>(target.Value.Entity).WorldId;
             var blockPos = entityManager.GetComponentData<Block>(target.Value.Entity).Pos;
             CommandTransferManager.NetworkAdapter?.SendToServer(new BlockUpdateEvent {
                 WorldId = worldId,
                 ChunkPos = new System.Numerics.Vector3(chunkPos.x, chunkPos.y, chunkPos.z),
                 BlockPos = new System.Numerics.Vector3(blockPos.x, blockPos.y, blockPos.z),
-                ActionType = BlockUpdateEvent.ActionTypeEnum.Action,
+                ActionType = BlockUpdateEvent.ActionTypeEnum.Active,
                 Direction = target.Value.Direction
             });
         }
