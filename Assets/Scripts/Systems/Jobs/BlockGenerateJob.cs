@@ -35,6 +35,7 @@ namespace Systems.Jobs {
                 Scale = 1
             });
             Ecb.SetComponent(index, e, new Block {
+                BlockId = Data[index].BlockId, 
                 Pos = Data[index].Pos
             });
             Ecb.SetSharedComponent(index, e, new Chunk {
