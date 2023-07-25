@@ -3,7 +3,9 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using Base.Const;
+using Base.Utils;
 using UnityEngine;
+using Utils;
 
 namespace Managers {
     /// <summary>
@@ -14,11 +16,13 @@ namespace Managers {
     public class LocalChunkManager {
         public static LocalChunkManager Instance { get; } = new();
         private readonly ConcurrentDictionary<Vector3, long> _chunkVersionCache = new();
+        private readonly ConcurrentDictionary<Vector3, Chunk> _chunkCache = new();
 
         private LocalChunkManager() { }
         
-        public void AddChunkVersion(Vector3 pos, long version) {
-            _chunkVersionCache[pos] = version;
+        public void AddChunkVersion(Vector3 pos, Chunk chunk) {
+            _chunkVersionCache[pos] = chunk.Version;
+            _chunkCache[pos] = DeepCopyHelper.DeepCopy(chunk);
         }
         
         public long GetChunkVersion(Vector3 pos) {
@@ -26,6 +30,10 @@ namespace Managers {
                 return -1;
             }
             return _chunkVersionCache[pos];
+        }
+        
+        public Chunk GetChunk(Vector3 pos) {
+            return !_chunkCache.TryGetValue(pos, out _) ? null : _chunkCache[pos];
         }
         
         public HashSet<Vector3> AutoUnloadChunk(Vector3 playerPos) {

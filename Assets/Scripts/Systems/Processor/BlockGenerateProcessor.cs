@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using Base.Const;
-using Base.Events;
 using Base.Events.ServerEvent;
 using Components;
 using Managers;
@@ -22,6 +21,7 @@ namespace Systems.Processor {
             if (entityManager.HasComponent<Block>(cube)) return cube;
             entityManager.AddComponent<Block>(cube);
             entityManager.AddComponent<Chunk>(cube);
+            entityManager.AddComponent<BlockTransform>(cube);
             entityManager.AddComponent<GameWorld>(cube);
             entityManager.AddComponentData(cube,new RenderBounds { Value = SubMeshCacheManager.Instance.RenderEdge });
             return cube;
@@ -38,13 +38,15 @@ namespace Systems.Processor {
             );
             if (chunk.Version == LocalChunkManager.Instance.GetChunkVersion(pos)) return;
             var chunkExist = LocalChunkManager.Instance.GetChunkVersion(pos) == -1;
-            if (!chunkExist && chunk.IsEmpty) return;
-            if (chunkExist) {
-                // 区块尚未生成
-                GenerateNewChunk(chunk, pos, ecb, prototype);
-            } else {
-                // 区块已经生成，但是需要更新
-                ModifiedExistChunk(entityManager, chunk, pos, ecb, prototype);
+            switch (chunkExist) {
+                case true:
+                    // 区块尚未生成
+                    GenerateNewChunk(chunk, pos, ecb, prototype);
+                    break;
+                default:
+                    // 区块已经生成，但是需要更新
+                    ModifiedExistChunk(chunk, pos, ecb, prototype);
+                    break;
             }
         }
 
@@ -70,7 +72,7 @@ namespace Systems.Processor {
                 }
             }
 
-            LocalChunkManager.Instance.AddChunkVersion(pos, chunk.Version);
+            LocalChunkManager.Instance.AddChunkVersion(pos, chunk);
             var cubes = CollectionHelper.CreateNativeArray<BlockGenerateJob.BlockInfoForJob>(transformArray.Count,
                 Allocator.TempJob);
             for (var i = 0; i < transformArray.Count; i++) {
@@ -87,55 +89,40 @@ namespace Systems.Processor {
             cubes.Dispose();
         }
         
-        private bool IsEqual(Block clientBlock, Base.Blocks.Block serverBlock) {
-            return SubMeshCacheManager.Instance.GetMeshId(serverBlock.ID) == clientBlock.BlockId;
+        private bool IsEqual(Base.Blocks.Block clientBlock, Base.Blocks.Block serverBlock) {
+            return serverBlock.ID == clientBlock.ID;
         }
 
-        private void ModifiedExistChunk(EntityManager entityManager, Base.Utils.Chunk chunk, Vector3 pos, EntityCommandBuffer ecb, Entity prototype) {
-            _query.SetSharedComponentFilterManaged(new Chunk {
-                Pos = pos
-            });
-            var entities = _query.ToEntityArray(Allocator.TempJob);
+        private void ModifiedExistChunk(Base.Utils.Chunk chunk, Vector3 pos, EntityCommandBuffer ecb, Entity prototype) {
+            var oldChunk = LocalChunkManager.Instance.GetChunk(pos);
             var modified = new List<BlockUpdateJob.BlockInfoForJob>();
-            var pointSet = new HashSet<Vector3>();
             // 先看有多少修改了的方块
-            foreach (var item in entities) {
-                var block = entityManager.GetComponentData<Block>(item);
-                var serverBlock = chunk.GetBlock((int)block.Pos.x, (int)block.Pos.y, (int)block.Pos.z);
-                if (IsEqual(block, serverBlock)) continue;
+            for (var i = 0; i < oldChunk.BlockData.Length; i++) {
+                var serverBlock = chunk.BlockData[i];
+                if (IsEqual(oldChunk.BlockData[i], serverBlock)) continue;
+                var position = new Vector3(
+                    i / ParamConst.ChunkSize % ParamConst.ChunkSize,
+                    i / ParamConst.ChunkSize / ParamConst.ChunkSize,
+                    i % ParamConst.ChunkSize
+                );
+                _query.SetSharedComponentFilter(new BlockTransform {
+                    ChunkPos = new Vector3(
+                        chunk.Position.X,
+                        chunk.Position.Y,
+                        chunk.Position.Z
+                    ),
+                    BlockPos = position
+                });
+                var oldIsAir = oldChunk.BlockData[i].Transparent;
                 modified.Add(new BlockUpdateJob.BlockInfoForJob {
                     ShouldCreate = false,
-                    Entity = item,
+                    Entity = oldIsAir ? null : _query.GetSingletonEntity(),
                     BlockId = SubMeshCacheManager.Instance.GetMeshId(serverBlock.ID),
-                    Pos = block.Pos,
+                    Pos = position,
                     RenderFlags = serverBlock.RenderFlags,
                     ChunkPos = pos,
                     WorldId = chunk.WorldId
                 });
-                pointSet.Add(block.Pos);
-            }
-            // 再看有多少新增的方块
-            for (var x = 0; x < ParamConst.ChunkSize; x++) {
-                for (var y = 0; y < ParamConst.ChunkSize; y++) {
-                    for (var z = 0; z < ParamConst.ChunkSize; z++) {
-                        if (pointSet.Contains(new Vector3(x, y, z))) continue;
-                        var block = chunk.GetBlock(x, y, z);
-                        if (block.Transparent) continue;
-                        modified.Add(new BlockUpdateJob.BlockInfoForJob {
-                            ShouldCreate = true,
-                            Entity = null,
-                            BlockId = SubMeshCacheManager.Instance.GetMeshId(block.ID),
-                            Pos = new float3(
-                                x + pos.x * ParamConst.ChunkSize,
-                                y + pos.y * ParamConst.ChunkSize,
-                                z + pos.z * ParamConst.ChunkSize
-                            ),
-                            RenderFlags = block.RenderFlags,
-                            ChunkPos = pos,
-                            WorldId = chunk.WorldId
-                        });
-                    }
-                }
             }
             var cubes = CollectionHelper.CreateNativeArray<BlockUpdateJob.BlockInfoForJob>(modified.Count,
                 Allocator.TempJob);
@@ -144,14 +131,13 @@ namespace Systems.Processor {
             }
             var job = new BlockUpdateJob {
                 Ecb = ecb.AsParallelWriter(),
-                EntityData = cubes,
+                Data = cubes,
                 Prototype = prototype
             };
             var task = job.Schedule(cubes.Length, 256);
             task.Complete();
             _query.ResetFilter();
-            entities.Dispose();
-            LocalChunkManager.Instance.AddChunkVersion(pos, chunk.Version);
+            LocalChunkManager.Instance.AddChunkVersion(pos, chunk);
         }
     }
 }

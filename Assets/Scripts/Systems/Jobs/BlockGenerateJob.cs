@@ -41,6 +41,10 @@ namespace Systems.Jobs {
             Ecb.SetSharedComponent(index, e, new Chunk {
                 Pos = Data[index].ChunkPos
             });
+            Ecb.SetSharedComponent(index, e, new BlockTransform {
+                ChunkPos = Data[index].ChunkPos,
+                BlockPos = Data[index].Pos
+            });
             Ecb.SetSharedComponent(index, e, new GameWorld {
                 WorldId = Data[index].WorldId
             });

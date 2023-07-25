@@ -25,14 +25,13 @@ namespace Systems.Jobs {
 
         public EntityCommandBuffer.ParallelWriter Ecb;
         public Entity Prototype;
-        [ReadOnly] public NativeArray<BlockInfoForJob> EntityData;
+        [ReadOnly] public NativeArray<BlockInfoForJob> Data;
 
         public void Execute(int index) {
-            var item = EntityData[index];
+            var item = Data[index];
             if (item is { ShouldCreate: false, Entity: not null }) {
                 Ecb.DestroyEntity(index, item.Entity.Value);
             }
-            var entity = Ecb.Instantiate(index, Prototype);
             var e = Ecb.Instantiate(index, Prototype);
             // 添加这个组件才能让方块显示在世界里
             Ecb.SetComponent(index, e, new LocalToWorld {
@@ -48,6 +47,10 @@ namespace Systems.Jobs {
             });
             Ecb.SetSharedComponent(index, e, new Components.Chunk {
                 Pos = item.ChunkPos
+            });
+            Ecb.SetSharedComponent(index, e, new BlockTransform {
+                ChunkPos = Data[index].ChunkPos,
+                BlockPos = Data[index].Pos
             });
             Ecb.SetSharedComponent(index, e, new GameWorld {
                 WorldId = item.WorldId

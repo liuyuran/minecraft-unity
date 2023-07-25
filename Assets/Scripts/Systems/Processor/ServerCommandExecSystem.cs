@@ -1,6 +1,5 @@
 ﻿using System.Threading;
 using Base;
-using Base.Events;
 using Base.Events.ClientEvent;
 using Base.Events.ServerEvent;
 using Base.Manager;
@@ -24,7 +23,7 @@ namespace Systems.Processor {
         public void OnCreate(ref SystemState state) {
             state.RequireForUpdate<EntityGenerator>();
             _query = new EntityQueryBuilder(Allocator.Temp)
-                .WithAll<Chunk>()
+                .WithAll<Chunk, Components.Block>()
                 .Build(state.EntityManager);
             UnitySystemConsoleRedirect.Redirect();
             new Thread(() => { Game.Start(""); }).Start();
