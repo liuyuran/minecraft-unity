@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using Base.Components;
 using Base.Const;
 using Base.Utils;
 using UnityEngine;
@@ -17,6 +18,7 @@ namespace Managers {
         public static LocalChunkManager Instance { get; } = new();
         private readonly ConcurrentDictionary<Vector3, long> _chunkVersionCache = new();
         private readonly ConcurrentDictionary<Vector3, Chunk> _chunkCache = new();
+        private readonly ConcurrentDictionary<Vector3, Dictionary<System.Numerics.Vector3, List<DroppedItem>>> _itemCache = new();
 
         private LocalChunkManager() { }
         
@@ -34,6 +36,14 @@ namespace Managers {
         
         public Chunk GetChunk(Vector3 pos) {
             return !_chunkCache.TryGetValue(pos, out _) ? null : _chunkCache[pos];
+        }
+        
+        public void AddItem(Vector3 pos, Dictionary<System.Numerics.Vector3, List<DroppedItem>> item) {
+            _itemCache[pos] = item;
+        }
+        
+        public Dictionary<System.Numerics.Vector3, List<DroppedItem>> GetItem(Vector3 pos) {
+            return !_itemCache.TryGetValue(pos, out _) ? null : _itemCache[pos];
         }
         
         public HashSet<Vector3> AutoUnloadChunk(Vector3 playerPos) {
@@ -55,11 +65,15 @@ namespace Managers {
         public void RemoveChunks(HashSet<Vector3> chunks) {
             foreach (var chunk in chunks) {
                 _chunkVersionCache.Remove(chunk, out _);
+                _chunkCache.Remove(chunk, out _);
+                _itemCache.Remove(chunk, out _);
             }
         }
         
         public void Clear() {
             _chunkVersionCache.Clear();
+            _chunkCache.Clear();
+            _itemCache.Clear();
         }
     }
 }

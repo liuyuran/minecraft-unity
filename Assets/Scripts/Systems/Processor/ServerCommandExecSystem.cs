@@ -18,12 +18,17 @@ namespace Systems.Processor {
     [BurstCompile]
     [UpdateInGroup(typeof(GameSystemGroup))]
     public partial struct ServerCommandExecSystem : ISystem {
-        private EntityQuery _query;
+        private EntityQuery _blockQuery;
+        private EntityQuery _itemQuery;
+        private static bool _isInit;
         
         public void OnCreate(ref SystemState state) {
             state.RequireForUpdate<EntityGenerator>();
-            _query = new EntityQueryBuilder(Allocator.Temp)
+            _blockQuery = new EntityQueryBuilder(Allocator.Temp)
                 .WithAll<Chunk, Components.Block>()
+                .Build(state.EntityManager);
+            _itemQuery = new EntityQueryBuilder(Allocator.Temp)
+                .WithAll<Chunk, Item>()
                 .Build(state.EntityManager);
             UnitySystemConsoleRedirect.Redirect();
             new Thread(() => { Game.Start(""); }).Start();
@@ -34,7 +39,8 @@ namespace Systems.Processor {
         }
 
         public void OnDestroy(ref SystemState state) {
-            //
+            _blockQuery.Dispose();
+            _itemQuery.Dispose();
         }
 
         public void OnUpdate(ref SystemState state) {
@@ -42,12 +48,17 @@ namespace Systems.Processor {
             var entityManager = state.EntityManager;
             var ecb = new EntityCommandBuffer(Allocator.TempJob);
             // 开始刷新区块
-            var prototype = GetBlockPrototype(entityManager);
+            if (_isInit) {
+                GetBlockPrototype(entityManager);
+                GetItemPrototype(entityManager);
+                _isInit = true;
+            }
+            var generator = SystemAPI.GetSingleton<EntityGenerator>();
             while (CommandTransferManager.NetworkAdapter?.TryGetFromServer(out var message) ?? false) {
                 if (message == null) return;
                 switch (message) {
                     case ChunkUpdateEvent chunkUpdateEvent:
-                        GenerateChunkBlocks(entityManager, ecb, prototype, chunkUpdateEvent);
+                        GenerateChunkBlocks(generator, ecb, chunkUpdateEvent);
                         break;
                 }
             }

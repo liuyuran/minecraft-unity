@@ -30,6 +30,7 @@ namespace Systems {
         }
 
         public void OnUpdate(ref SystemState state) {
+            // 先禁用，然后在下一逻辑帧清理
             var entityManager = state.EntityManager;
             // 清理此前禁用的区块
             entityManager.DestroyEntity(_query);
