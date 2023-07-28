@@ -11,7 +11,7 @@ using Unity.Collections;
 using Unity.Entities;
 using Utils;
 
-namespace Systems.Processor {
+namespace Systems.PlayingSystem.Processor {
     /// <summary>
     /// 从基础库的支持类中获取命令执行队列，然后执行
     /// </summary>
@@ -54,7 +54,7 @@ namespace Systems.Processor {
                 _isInit = true;
             }
             var generator = SystemAPI.GetSingleton<EntityGenerator>();
-            while (CommandTransferManager.NetworkAdapter?.TryGetFromServer(out var message) ?? false) {
+            while (Base.Manager.CommandTransferManager.NetworkAdapter?.TryGetFromServer(out var message) ?? false) {
                 if (message == null) return;
                 switch (message) {
                     case ChunkUpdateEvent chunkUpdateEvent:

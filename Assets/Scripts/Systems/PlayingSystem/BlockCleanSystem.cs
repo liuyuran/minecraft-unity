@@ -8,7 +8,7 @@ using Unity.Collections;
 using Unity.Entities;
 using UnityEngine;
 
-namespace Systems {
+namespace Systems.PlayingSystem {
     /// <summary>
     /// 清理区块
     /// </summary>

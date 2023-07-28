@@ -1,13 +1,20 @@
 ﻿using Systems.SystemGroups;
 using Unity.Burst;
 using Unity.Entities;
+using Unity.Mathematics;
+using Unity.Transforms;
+using UnityEngine;
+using UnityEngine.UI;
 
-namespace Systems {
+namespace Systems.MenuSystem {
     [BurstCompile]
     [UpdateInGroup(typeof(MainMenuSystemGroup))]
     public partial struct MenuSystem : ISystem {
+        private Entity _canvasEntity;
+        
         public void OnCreate(ref SystemState state) {
-            //
+            var entityManager = state.EntityManager;
+            // 创建画布
         }
 
         public void OnDestroy(ref SystemState state) {

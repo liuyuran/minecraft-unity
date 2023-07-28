@@ -4,18 +4,17 @@ using Base.Const;
 using Base.Events.ServerEvent;
 using Components;
 using Managers;
-using Systems.Jobs;
+using Systems.PlayingSystem.Jobs;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
 using Unity.Mathematics;
 using Unity.Rendering;
 using UnityEngine;
-using Entity = Unity.Entities.Entity;
 using Item = Base.Items.Item;
 using SystemAPI = Unity.Entities.SystemAPI;
 
-namespace Systems.Processor {
+namespace Systems.PlayingSystem.Processor {
     public partial struct ServerCommandExecSystem {
         private void GetBlockPrototype(EntityManager entityManager) {
             var generator = SystemAPI.GetSingleton<EntityGenerator>();

@@ -5,7 +5,7 @@ using Unity.Mathematics;
 using UnityEngine;
 using Entity = Unity.Entities.Entity;
 
-namespace Systems.Jobs {
+namespace Systems.PlayingSystem.Jobs {
     public struct ItemGenerateJob : IJobParallelFor {
         public struct ItemInfoForJob {
             public bool IsCreate;

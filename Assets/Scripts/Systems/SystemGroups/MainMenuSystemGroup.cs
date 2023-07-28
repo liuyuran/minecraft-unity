@@ -1,5 +1,7 @@
-﻿namespace Systems.SystemGroups {
+﻿using Const;
+
+namespace Systems.SystemGroups {
     public partial class MainMenuSystemGroup: BaseSystemGroup {
-        protected override string AuthoringSceneName => "MainMenu";
+        protected override GameState State => GameState.Menu;
     }
 }

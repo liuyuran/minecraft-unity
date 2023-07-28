@@ -1,15 +1,19 @@
-﻿using Base.Manager;
+﻿using Base.Events.ClientEvent;
+using Base.Manager;
 using Camera;
+using Components;
+using Systems.SystemGroups;
+using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
 using UnityEngine;
-using Base.Events.ClientEvent;
-using Components;
 
-namespace Systems {
+namespace Systems.PlayingSystem {
     /// <summary>
     /// 拾取系统，一定距离内物品会飞向角色并消失
     /// </summary>
+    [BurstCompile]
+    [UpdateInGroup(typeof(GameSystemGroup))]
     public partial struct PickupSystem: ISystem {
         private const int PickDistance = 3;
         private EntityQuery _query;
