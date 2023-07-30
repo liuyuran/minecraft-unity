@@ -21,7 +21,6 @@ namespace Systems.PlayingSystem {
         }
 
         protected override void OnDestroy() {
-            _newRequests.Dispose();
         }
 
         protected override void OnUpdate() {

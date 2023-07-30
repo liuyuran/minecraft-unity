@@ -1,15 +1,10 @@
-﻿using System.Threading;
-using Base;
-using Base.Events.ClientEvent;
-using Base.Events.ServerEvent;
-using Base.Manager;
+﻿using Base.Events.ServerEvent;
 using Components;
 using Managers;
 using Systems.SystemGroups;
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
-using Utils;
 
 namespace Systems.PlayingSystem.Processor {
     /// <summary>
@@ -30,12 +25,11 @@ namespace Systems.PlayingSystem.Processor {
             _itemQuery = new EntityQueryBuilder(Allocator.Temp)
                 .WithAll<Chunk, Item>()
                 .Build(state.EntityManager);
-            UnitySystemConsoleRedirect.Redirect();
-            new Thread(() => { Game.Start(""); }).Start();
-            Thread.Sleep(1000);
-            CommandTransferManager.NetworkAdapter?.SendToServer(new PlayerJoinEvent {
-                Nickname = "Kamoeth"
-            });
+            // new Thread(() => { Game.Start(""); }).Start();
+            // Thread.Sleep(1000);
+            // CommandTransferManager.NetworkAdapter?.SendToServer(new PlayerJoinEvent {
+            //     Nickname = "Kamoeth"
+            // });
         }
 
         public void OnDestroy(ref SystemState state) {

@@ -120,7 +120,7 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
---- !u!1001 &747572265
+--- !u!1001 &868954112
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
@@ -321,6 +321,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2065198063}
   - component: {fileID: 2065198064}
+  - component: {fileID: 2065198065}
   m_Layer: 0
   m_Name: CubeRegistry
   m_TagString: Untagged
@@ -357,6 +358,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   player: {fileID: 5213627834737787506, guid: f62bdedabeb2eeb49a5d3d93520b585a, type: 3}
   cube: {fileID: 2948057655174179408, guid: 9e1e7c28237bc7f47ae43ad21da846d1, type: 3}
+--- !u!114 &2065198065
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2065198062}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 85b226c5bb1b42e1baf90ff4abf49534, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  startMenu: {fileID: 0}
 --- !u!1001 &7150334106169131025
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -693,7 +707,7 @@ PrefabInstance:
     - target: {fileID: 5501349139152353895, guid: f62bdedabeb2eeb49a5d3d93520b585a,
         type: 3}
       propertyPath: m_Enabled
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6285055080256139395, guid: f62bdedabeb2eeb49a5d3d93520b585a,
         type: 3}
