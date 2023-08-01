@@ -14,17 +14,10 @@ namespace Systems.MenuSystem {
         
         public void OnCreate(ref SystemState state) {
             var entityManager = state.EntityManager;
-            _canvasEntity = entityManager.CreateEntity(
-                typeof(RectTransform),
-                typeof(Canvas),
-                typeof(CanvasScaler),
-                typeof(GraphicRaycaster)
-            );
         }
 
         public void OnDestroy(ref SystemState state) {
             var entityManager = state.EntityManager;
-            entityManager.DestroyEntity(_canvasEntity);
         }
 
         public void OnUpdate(ref SystemState state) {
