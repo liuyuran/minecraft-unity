@@ -12,10 +12,11 @@ namespace Monos.UI {
         /// <param name="listener">UI后处理器</param>
         private void RegistryUI(string uiName, string path, UIListenerDelegate listener) {
             if (_uxmlLink.ContainsKey(uiName)) throw new DuplicateUIException(uiName);
-            var uiAsset = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(path);
-            var ui = uiAsset.Instantiate();
-            listener?.Invoke(ref ui);
-            _uxmlLink.Add(uiName, ui);
+            var uiAsset = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>($"Assets/{path}");
+            _uxmlLink.Add(uiName, uiAsset);
+            // var ui = uiAsset.CloneTree();
+            // listener?.Invoke(ref ui);
+            // _uxmlLink.Add(uiName, ui);
         }
 
         /// <summary>
@@ -24,8 +25,10 @@ namespace Monos.UI {
         /// <param name="uiName">UI名字</param>
         private void JumpUI(string uiName) {
             if (!_uxmlLink.ContainsKey(uiName)) throw new UINotFoundException(uiName);
-            _uiDocument.rootVisualElement.Clear();
-            _uiDocument.rootVisualElement.Add(_uxmlLink[uiName]);
+            var parent = uiDocument.rootVisualElement.Q("root");
+            var tree = _uxmlLink[uiName].CloneTree();
+            parent.Add(tree);
+            tree.StretchToParentSize();
         }
 
         /// <summary>
@@ -34,7 +37,7 @@ namespace Monos.UI {
         /// <param name="uiName">UI名字</param>
         private void OpenUI(string uiName) {
             if (!_uxmlLink.ContainsKey(uiName)) throw new UINotFoundException(uiName);
-            _uiDocument.rootVisualElement.Add(_uxmlLink[uiName]);
+            // uiDocument.rootVisualElement.Add(_uxmlLink[uiName]);
         }
 
         /// <summary>
@@ -43,7 +46,7 @@ namespace Monos.UI {
         /// <param name="uiName">UI名字</param>
         private void CloseUI(string uiName) {
             if (!_uxmlLink.ContainsKey(uiName)) throw new UINotFoundException(uiName);
-            _uiDocument.rootVisualElement.Remove(_uxmlLink[uiName]);
+            // uiDocument.rootVisualElement.Remove(_uxmlLink[uiName]);
         }
     }
 }

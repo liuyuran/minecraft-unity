@@ -14,10 +14,11 @@ namespace Monos.UI {
     /// 不可改成UGUI，那玩意性能消耗太大，而且不符合完全迎合Unity官方建议的初衷
     /// </summary>
     public partial class UIManager : MonoBehaviour {
-        private UIDocument _uiDocument;
+        [SerializeField] public UIDocument uiDocument;
+        [SerializeField] VisualTreeAsset myTreeAssetMember;
         private GameState? _nowState;
-        private readonly IDictionary<string, TemplateContainer> _uxmlLink = new Dictionary<string, TemplateContainer>();
-
+        private readonly IDictionary<string, VisualTreeAsset> _uxmlLink = new Dictionary<string, VisualTreeAsset>();
+        
         private void Awake() {
             _uxmlLink.Clear();
             // TODO 预期通过MODManager动态读取自定义UI
@@ -34,7 +35,7 @@ namespace Monos.UI {
         /// <exception cref="ArgumentOutOfRangeException">当State出现意外值的时候</exception>
         private void UpdateUIDocument() {
             var targetState = GameManager.Instance.State;
-            if (_nowState == targetState) return;
+            if (_nowState == targetState || !uiDocument.isActiveAndEnabled) return;
             switch (targetState) {
                 case GameState.Menu:
                     JumpUI("main-menu");
