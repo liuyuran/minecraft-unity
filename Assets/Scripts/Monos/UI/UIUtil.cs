@@ -12,7 +12,7 @@ namespace Monos.UI {
         /// <param name="listener">UI后处理器</param>
         private void RegistryUI(string uiName, string path, UIListenerDelegate listener) {
             if (_uxmlLink.ContainsKey(uiName)) throw new DuplicateUIException(uiName);
-            var uiAsset = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(path);
+            var uiAsset = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>($"Assets/{path}");
             var ui = uiAsset.Instantiate();
             listener?.Invoke(ref ui);
             _uxmlLink.Add(uiName, ui);

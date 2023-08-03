@@ -1,13 +1,12 @@
-﻿using Base.Events.ServerEvent;
+﻿using System.Runtime.InteropServices;
+using Base.Events.ServerEvent;
 using Camera;
 using Components;
-using Const;
 using Managers;
 using Systems.SystemGroups;
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
-using Unity.Physics;
 using Player = Base.Components.Player;
 
 namespace Systems.PlayingSystem.Processor {
@@ -16,6 +15,7 @@ namespace Systems.PlayingSystem.Processor {
     /// </summary>
     [BurstCompile]
     [UpdateInGroup(typeof(GameSystemGroup))]
+    [StructLayout(LayoutKind.Auto)]
     public partial struct ServerCommandExecSystem : ISystem {
         private EntityQuery _blockQuery;
         private EntityQuery _itemQuery;
@@ -64,9 +64,9 @@ namespace Systems.PlayingSystem.Processor {
             ecb.Dispose();
             if (_isInit) return;
             _isInit = true;
-            GameManager.Instance.SetState(GameState.Playing);
+            GameManager.Instance.SetState(Const.GameState.Playing);
             // 第一次生成地形后，再给角色赋予重力属性
-            var physicsGravityFactor = new PhysicsGravityFactor { Value = 1.0f };
+            var physicsGravityFactor = new Unity.Physics.PhysicsGravityFactor { Value = 1.0f };
             entityManager.SetComponentData(_playerQuery.GetSingletonEntity(), physicsGravityFactor);
         }
     }
