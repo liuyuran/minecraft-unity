@@ -1,4 +1,5 @@
-﻿using Base.Events.ServerEvent;
+﻿using System.Runtime.InteropServices;
+using Base.Events.ServerEvent;
 using Camera;
 using Components;
 using Managers;
@@ -14,6 +15,7 @@ namespace Systems.PlayingSystem.Processor {
     /// </summary>
     [BurstCompile]
     [UpdateInGroup(typeof(GameSystemGroup))]
+    [StructLayout(LayoutKind.Auto)]
     public partial struct ServerCommandExecSystem : ISystem {
         private EntityQuery _blockQuery;
         private EntityQuery _itemQuery;
