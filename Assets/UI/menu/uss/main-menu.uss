@@ -1,32 +1,32 @@
-.titleBar {
+.title-bar {
     margin: 16px;
     display: flex;
     flex-grow: 0;
     flex-direction: column;
 }
 
-.titleBar .title {
+.title-bar .title {
     font-size: 32px;
     -unity-text-align: middle-center;
 }
 
-.titleBar .subTitle {
+.title-bar .subtitle {
     font-size: 24px;
     -unity-text-align: middle-center;
 }
 
-.bodyBar {
+.body-bar {
     margin: 16px;
     display: flex;
     flex-grow: 1;
     flex-direction: column-reverse;
 }
 
-.bodyBar .bodyLine {
+.body-bar .body-line {
     display: flex;
     flex-direction: row;
 }
 
-.bodyBar .bodyLine button {
-    
+.body-bar .body-line button {
+    flex-grow: 1;
 }

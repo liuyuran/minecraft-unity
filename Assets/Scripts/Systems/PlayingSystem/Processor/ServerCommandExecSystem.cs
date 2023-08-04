@@ -7,7 +7,6 @@ using Systems.SystemGroups;
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
-using Player = Base.Components.Player;
 
 namespace Systems.PlayingSystem.Processor {
     /// <summary>

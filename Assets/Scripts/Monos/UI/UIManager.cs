@@ -26,7 +26,7 @@ namespace Monos.UI {
             RegistryUI("loading", "UI/public/loading.uxml", null);
             RegistryUI("playing", "UI/in-game/playing.uxml", PlayingListener);
             RegistryUI("option", "UI/menu/option.uxml", OptionListener);
-            RegistryUI("achievement", "UI/menu/achievement.uxml", AchievementListener);
+            RegistryUI("achievement", "UI/menu/about.uxml", AboutListener);
         }
 
         /// <summary>
