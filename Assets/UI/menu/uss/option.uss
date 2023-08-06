@@ -1,0 +1,90 @@
+.root-option {
+    flex-grow: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(0, 0, 0, 0.5);
+    -unity-font-definition: url('project://database/Assets/UI/Font/SmileySans-Oblique.ttf?fileID=12800000&guid=4455ffa7396ff1748b381e16243fa2c8&type=3#SmileySans-Oblique');
+    color: white;
+}
+
+.root-option .container {
+    border-width: 1px;
+    border-color: #ffc83c;
+    width: 400px;
+    background-color: #333333;
+}
+
+.root-option .title-bar {
+    display: flex;
+    flex-direction: row;
+    border-bottom-color: #ffc83c;
+    border-bottom-width: 1px;
+}
+
+.root-option .title-bar .unity-label {
+    flex-grow: 1;
+    font-size: 20px;
+    color: #ffc83c;
+    -unity-text-align: middle-center;
+}
+
+.root-option .title-bar .unity-button {
+    flex-grow: 0;
+    width: 30px;
+    height: 30px;
+    margin: 5px;
+    padding-top: 8px;
+    border-width: 1px;
+    border-color: #ffc83c;
+    color: #ffc83c;
+    background-color: dimgray;
+    font-size: 18px;
+    -unity-text-align: middle-center;
+}
+
+.root-option .sub-bar {
+    display: flex;
+    flex-grow: 0;
+    flex-direction: row;
+    padding: 8px;
+}
+
+.root-option .sub-bar .unity-button {
+    width: 100px;
+    height: 30px;
+    border-color: #5e0000;
+    background-color: #734949;
+}
+
+.root-option .body-bar {
+    height: 300px;
+    color: white;
+}
+
+.root-option .body-bar .line {
+    padding-left: 0;
+    padding-right: 32px;
+}
+
+.root-option .body-bar .line .unity-label {
+    -unity-text-align: middle-right;
+    min-width: 70px;
+    max-width: 70px;
+}
+
+.root-option .body-bar .line .unity-text-field__input {
+    padding-top: 0;
+    padding-bottom: 0;
+    border-color: white;
+    background-color: rgba(0, 0, 0, 0);
+}
+
+.root-option .body-bar .line .unity-text-field:focus .unity-label {
+    color: white;
+}
+
+.root-option .body-bar .line .unity-text-field:hover .unity-text-field__input {
+    color: white;
+    border-color: white;
+}

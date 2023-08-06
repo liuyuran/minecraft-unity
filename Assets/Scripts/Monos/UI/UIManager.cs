@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Base.Manager;
 using Const;
 using Managers;
 using UnityEngine;
@@ -15,18 +16,20 @@ namespace Monos.UI {
     /// </summary>
     public partial class UIManager : MonoBehaviour {
         [SerializeField] public UIDocument uiDocument;
-        [SerializeField] VisualTreeAsset myTreeAssetMember;
         private GameState? _nowState;
-        private readonly IDictionary<string, VisualTreeAsset> _uxmlLink = new Dictionary<string, VisualTreeAsset>();
+        private readonly IDictionary<string, TemplateContainer> _uxmlLink = new Dictionary<string, TemplateContainer>();
         
         private void Awake() {
             _uxmlLink.Clear();
+            // 初始化mod管理器
+            ModManager.Instance.ScanAllMod();
+            LogManager.Instance.Info("扩展模组扫描完成");
             // TODO 预期通过MODManager动态读取自定义UI
             RegistryUI("main-menu", "UI/menu/main-menu.uxml", MainMenuListener);
             RegistryUI("loading", "UI/public/loading.uxml", null);
             RegistryUI("playing", "UI/in-game/playing.uxml", PlayingListener);
             RegistryUI("option", "UI/menu/option.uxml", OptionListener);
-            RegistryUI("achievement", "UI/menu/about.uxml", AboutListener);
+            RegistryUI("mods", "UI/menu/mods.uxml", ModsListener);
         }
 
         /// <summary>

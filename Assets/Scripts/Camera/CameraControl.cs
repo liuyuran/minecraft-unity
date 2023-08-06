@@ -14,8 +14,6 @@ namespace Camera {
         private KeyActionSettings.StandardActions _standardActions;
 
         private void Start() {
-            Cursor.lockState = CursorLockMode.Locked;
-            Cursor.visible = false; // 隐藏鼠标
             var eulerAngles = transform.eulerAngles;
             _yaw = eulerAngles.y;
             _pitch = eulerAngles.x;
@@ -34,9 +32,12 @@ namespace Camera {
         private void Update() {
             switch (GameManager.Instance.State) {
                 case GameState.Menu:
-                    // 
+                    Cursor.lockState = CursorLockMode.Confined;
+                    Cursor.visible = true; // 隐藏鼠标 
                     return;
                 case GameState.Playing:
+                    Cursor.lockState = CursorLockMode.Locked;
+                    Cursor.visible = false; // 隐藏鼠标
                     var rightStick = _standardActions.Look.ReadValue<Vector2>();
                     _yaw += lookSpeedH * rightStick.x;
                     _pitch -= lookSpeedV * rightStick.y;
@@ -44,6 +45,7 @@ namespace Camera {
                     _pitch = Mathf.Clamp(_pitch, -90, 90);
                     transform.eulerAngles = new Vector3(_pitch, _yaw, 0f);
                     break;
+                case GameState.Loading:
                 default:
                     return;
             }

@@ -1,19 +1,20 @@
-<ui:UXML xmlns:ui="UnityEngine.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
-    <ui:VisualElement name="root-main-menu">
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/UI/menu/uss/main-menu.uss?fileID=7433441132597879392&amp;guid=0932d2a20e7841b3b1e7bd85b2188f46&amp;type=3#main-menu" />
+    <ui:VisualElement name="root-main-menu" class="root">
         <ui:VisualElement name="title-bar" class="title-bar">
-            <ui:TextElement name="title" class="title" text="Main Menu" />
-            <ui:TextElement name="subtitle" class="subtitle" text="Main Menu" />
+            <ui:TextElement name="title" text="不一样的世界" class="title" style="-unity-font-style: normal;" />
+            <ui:TextElement name="subtitle" text="嗯？" class="subtitle" />
         </ui:VisualElement>
         <ui:VisualElement name="body-bar" class="body-bar">
             <ui:VisualElement class="body-line">
-                <ui:Button name="exit" text="退出游戏" />
+                <ui:Button name="exit" text="退出" />
             </ui:VisualElement>
             <ui:VisualElement class="body-line">
                 <ui:Button name="option" text="设置" />
-                <ui:Button name="about" text="关于" />
+                <ui:Button name="mods" text="扩展模组" />
             </ui:VisualElement>
             <ui:VisualElement class="body-line">
-                <ui:Button name="single-player" text="单机游戏" />
+                <ui:Button name="single-player" text="开始" />
             </ui:VisualElement>
         </ui:VisualElement>
     </ui:VisualElement>

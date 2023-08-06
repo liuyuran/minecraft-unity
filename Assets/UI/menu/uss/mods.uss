@@ -1,0 +1,18 @@
+.about-root {
+    flex-grow: 1;
+    margin: 64px;
+    -unity-font-definition: url('project://database/Assets/UI/Font/SmileySans-Oblique.ttf?fileID=12800000&guid=4455ffa7396ff1748b381e16243fa2c8&type=3#SmileySans-Oblique');
+}
+
+.about-title-bar {
+    display: flex;
+    flex-grow: 0;
+    flex-direction: column;
+    -unity-font-style: bold;
+}
+
+.about-body-bar {
+    display: flex;
+    flex-grow: 1;
+    flex-direction: column-reverse;
+}

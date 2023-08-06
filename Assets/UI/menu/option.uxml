@@ -1,8 +1,21 @@
-<ui:UXML xmlns:ui="UnityEngine.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
-    <ui:VisualElement name="root-option">
-        <ui:VisualElement name="title-bar" class="title-bar">
-        </ui:VisualElement>
-        <ui:VisualElement name="body-bar" class="body-bar">
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/UI/menu/uss/option.uss?fileID=7433441132597879392&amp;guid=c1a9dfaf53f6ab04dbf92278c07f726a&amp;type=3#option" />
+    <ui:VisualElement name="root-option" class="root-option">
+        <ui:VisualElement name="container" class="container">
+            <ui:VisualElement name="title-bar" class="title-bar">
+                <ui:Label tabindex="-1" text="设置" display-tooltip-when-elided="true" />
+                <ui:Button text="×" display-tooltip-when-elided="true" name="close" />
+            </ui:VisualElement>
+            <ui:VisualElement name="sub-bar" class="sub-bar">
+                <ui:Button name="game-sub" text="游戏性" display-tooltip-when-elided="true" />
+                <ui:Button name="graphic-sub" text="图形" display-tooltip-when-elided="true" />
+                <ui:Button name="voice-sub" text="声音" display-tooltip-when-elided="true" />
+            </ui:VisualElement>
+            <ui:ScrollView name="game-panel" horizontal-scroller-visibility="Hidden" class="body-bar">
+                <ui:VisualElement class="line">
+                    <ui:TextField picking-mode="Ignore" label="游戏名" value="filler text" />
+                </ui:VisualElement>
+            </ui:ScrollView>
         </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>

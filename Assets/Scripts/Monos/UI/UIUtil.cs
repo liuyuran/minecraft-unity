@@ -13,10 +13,9 @@ namespace Monos.UI {
         private void RegistryUI(string uiName, string path, UIListenerDelegate listener) {
             if (_uxmlLink.ContainsKey(uiName)) throw new DuplicateUIException(uiName);
             var uiAsset = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>($"Assets/{path}");
-            _uxmlLink.Add(uiName, uiAsset);
-            // var ui = uiAsset.CloneTree();
-            // listener?.Invoke(ref ui);
-            // _uxmlLink.Add(uiName, ui);
+            var ui = uiAsset.CloneTree();
+            listener?.Invoke(ref ui);
+            _uxmlLink.Add(uiName, ui);
         }
 
         /// <summary>
@@ -26,7 +25,7 @@ namespace Monos.UI {
         private void JumpUI(string uiName) {
             if (!_uxmlLink.ContainsKey(uiName)) throw new UINotFoundException(uiName);
             var parent = uiDocument.rootVisualElement.Q("root");
-            var tree = _uxmlLink[uiName].CloneTree();
+            var tree = _uxmlLink[uiName];
             parent.Add(tree);
             tree.StretchToParentSize();
         }
@@ -37,7 +36,10 @@ namespace Monos.UI {
         /// <param name="uiName">UI名字</param>
         private void OpenUI(string uiName) {
             if (!_uxmlLink.ContainsKey(uiName)) throw new UINotFoundException(uiName);
-            // uiDocument.rootVisualElement.Add(_uxmlLink[uiName]);
+            var parent = uiDocument.rootVisualElement.Q("root");
+            var tree = _uxmlLink[uiName];
+            parent.Add(tree);
+            tree.StretchToParentSize();
         }
 
         /// <summary>
@@ -46,7 +48,8 @@ namespace Monos.UI {
         /// <param name="uiName">UI名字</param>
         private void CloseUI(string uiName) {
             if (!_uxmlLink.ContainsKey(uiName)) throw new UINotFoundException(uiName);
-            // uiDocument.rootVisualElement.Remove(_uxmlLink[uiName]);
+            var parent = uiDocument.rootVisualElement.Q("root");
+            parent.Remove(_uxmlLink[uiName]);
         }
     }
 }

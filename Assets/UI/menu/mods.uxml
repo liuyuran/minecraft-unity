@@ -1,0 +1,7 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/UI/menu/uss/about.uss?fileID=7433441132597879392&amp;guid=6625177288a88654abb033865449a8e5&amp;type=3#about" />
+    <ui:VisualElement name="root-about" class="about-root">
+        <ui:VisualElement name="title-bar" class="about-title-bar" />
+        <ui:VisualElement name="body-bar" class="about-body-bar" />
+    </ui:VisualElement>
+</ui:UXML>

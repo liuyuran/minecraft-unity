@@ -24,9 +24,9 @@ namespace Monos.UI {
                 // 选项
                 OpenUI("option");
             };
-            ui.Query<Button>("about").First().clicked += () => {
-                // 成就
-                OpenUI("about");
+            ui.Query<Button>("mods").First().clicked += () => {
+                // 关于
+                OpenUI("mods");
             };
             ui.Query<Button>("exit").First().clicked += () => {
                 // 退出
@@ -42,10 +42,13 @@ namespace Monos.UI {
         }
 
         private void OptionListener(ref TemplateContainer ui) {
-            //
+            ui.Query<Button>("close").First().clicked += () => {
+                // 关于
+                CloseUI("option");
+            };
         }
 
-        private void AboutListener(ref TemplateContainer ui) {
+        private void ModsListener(ref TemplateContainer ui) {
             //
         }
     }

@@ -1,17 +1,24 @@
+.root {
+    flex-grow: 1; 
+    background-color: white;
+    -unity-font-definition: url('project://database/Assets/UI/Font/SmileySans-Oblique.ttf?fileID=12800000&guid=4455ffa7396ff1748b381e16243fa2c8&type=3#SmileySans-Oblique');
+}
+
 .title-bar {
     margin: 16px;
     display: flex;
     flex-grow: 0;
     flex-direction: column;
+    -unity-font-style: bold;
 }
 
 .title-bar .title {
-    font-size: 32px;
+    font-size: 40px;
     -unity-text-align: middle-center;
 }
 
 .title-bar .subtitle {
-    font-size: 24px;
+    font-size: 32px;
     -unity-text-align: middle-center;
 }
 
@@ -25,8 +32,14 @@
 .body-bar .body-line {
     display: flex;
     flex-direction: row;
+    justify-content: center;
+    margin-left: 0;
+    margin-right: 0;
+    margin-top: 8px;
+    margin-bottom: 0;
 }
 
-.body-bar .body-line button {
+.body-bar .body-line .unity-button {
     flex-grow: 1;
+    font-size: 20px;
 }
