@@ -11,7 +11,6 @@ using Unity.Jobs;
 using Unity.Mathematics;
 using Unity.Rendering;
 using UnityEngine;
-using Item = Base.Items.Item;
 using SystemAPI = Unity.Entities.SystemAPI;
 
 namespace Systems.PlayingSystem.Processor {

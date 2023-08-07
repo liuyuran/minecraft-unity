@@ -26,6 +26,7 @@ namespace Monos.UI {
             if (!_uxmlLink.ContainsKey(uiName)) throw new UINotFoundException(uiName);
             var parent = uiDocument.rootVisualElement.Q("root");
             var tree = _uxmlLink[uiName];
+            parent.Clear();
             parent.Add(tree);
             tree.StretchToParentSize();
         }

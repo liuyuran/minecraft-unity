@@ -13,12 +13,12 @@ namespace Monos.UI {
         private void MainMenuListener(ref TemplateContainer ui) {
             ui.Query<Button>("single-player").First().clicked += () => {
                 // 开始游戏，跳转界面将在Mono脚本的Update回调中完成
-                GameManager.Instance.SetState(GameState.Loading);
                 new Thread(() => { Game.Start(""); }).Start();
                 Thread.Sleep(1000);
                 CommandTransferManager.NetworkAdapter?.SendToServer(new PlayerJoinEvent {
                     Nickname = "Kamoeth"
                 });
+                GameManager.Instance.SetState(Const.GameState.Playing);
             };
             ui.Query<Button>("option").First().clicked += () => {
                 // 选项

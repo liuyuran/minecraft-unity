@@ -6,8 +6,8 @@ namespace Systems.SystemGroups {
     public abstract partial class BaseSystemGroup : ComponentSystemGroup {
 
         protected override void OnUpdate() {
-            Enabled = State == GameManager.Instance.State;
-            if (Enabled) base.OnUpdate();
+            if (State != GameManager.Instance.State) return;
+            base.OnUpdate();
         }
 
         protected abstract GameState State { get; }

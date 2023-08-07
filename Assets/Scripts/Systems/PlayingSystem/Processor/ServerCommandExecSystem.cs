@@ -7,6 +7,7 @@ using Systems.SystemGroups;
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
+using Unity.Physics;
 
 namespace Systems.PlayingSystem.Processor {
     /// <summary>
@@ -63,10 +64,13 @@ namespace Systems.PlayingSystem.Processor {
             ecb.Dispose();
             if (_isInit) return;
             _isInit = true;
-            GameManager.Instance.SetState(Const.GameState.Playing);
             // 第一次生成地形后，再给角色赋予重力属性
-            var physicsGravityFactor = new Unity.Physics.PhysicsGravityFactor { Value = 1.0f };
-            entityManager.SetComponentData(_playerQuery.GetSingletonEntity(), physicsGravityFactor);
+            // var physicsGravityFactor = new Unity.Physics.PhysicsGravityFactor { Value = 1.0f };
+            // var player = _playerQuery.GetSingletonEntity();
+            // if (entityManager.HasComponent<Unity.Physics.PhysicsGravityFactor>(player))
+            //     entityManager.SetComponentData(player, physicsGravityFactor);
+            // else
+            //     entityManager.AddComponentData(player, physicsGravityFactor);
         }
     }
 }
