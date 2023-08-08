@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Base.Components;
 using Base.Const;
 using Base.Events.ServerEvent;
 using Components;
@@ -191,7 +192,12 @@ namespace Systems.PlayingSystem.Processor {
                 // 本地有物品
                 var items = new List<ItemGenerateJob.ItemInfoForJob>();
                 foreach (var (key, value) in serverItems) {
-                    items.AddRange(value.Select(item => new { item, shouldCreate = !localItems.ContainsKey(key) || !localItems[key].Contains(item) })
+                    var unityKey = new Vector3(
+                        key.X,
+                        key.Y,
+                        key.Z
+                    );
+                    items.AddRange(value.Select(item => new { item, shouldCreate = !localItems.ContainsKey(unityKey) || !localItems[unityKey].Contains(item) })
                     .Where(@t => !@t.shouldCreate)
                     .Select(@t => new ItemGenerateJob.ItemInfoForJob {
                         IsCreate = true,
@@ -203,14 +209,19 @@ namespace Systems.PlayingSystem.Processor {
                     }));
                 }
                 foreach (var (key, value) in localItems) {
-                    items.AddRange(value.Select(item => new { item, shouldRemove = !serverItems.ContainsKey(key) || !serverItems[key].Contains(item) })
+                    var baseKey = new Base.Utils.Vector3(
+                        key.x,
+                        key.y,
+                        key.z
+                    );
+                    items.AddRange(value.Select(item => new { item, shouldRemove = !serverItems.ContainsKey(baseKey) || !serverItems[baseKey].Contains(item) })
                     .Where(@t => !@t.shouldRemove)
                     .Select(@t => new ItemGenerateJob.ItemInfoForJob {
                         IsCreate = false,
                         IsRemove = true,
                         ChunkPos = pos,
                         ItemId = SubMeshCacheManager.Instance.GetMeshId(@t.item.ItemID),
-                        Pos = new float3(key.X, key.Y, key.Z),
+                        Pos = new float3(key.x, key.y, key.z),
                         WorldId = chunk.WorldId
                     }));
                 }
@@ -229,7 +240,19 @@ namespace Systems.PlayingSystem.Processor {
                 task.Complete();
                 cubes.Dispose();
             }
-            LocalChunkManager.Instance.AddItem(pos, serverItems);
+            Dictionary<Vector3, List<DroppedItem>> unityServerItems = new();
+            foreach (var (key, value) in serverItems) {
+                var unityKey = new Vector3(
+                    key.X,
+                    key.Y,
+                    key.Z
+                );
+                if (!unityServerItems.ContainsKey(unityKey)) {
+                    unityServerItems.Add(unityKey, new List<DroppedItem>());
+                }
+                unityServerItems[unityKey].AddRange(value);
+            }
+            LocalChunkManager.Instance.AddItem(pos, unityServerItems);
         }
     }
 }

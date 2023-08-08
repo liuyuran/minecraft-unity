@@ -7,6 +7,7 @@ using Unity.Physics;
 using Unity.Rendering;
 using UnityEngine;
 using Material = UnityEngine.Material;
+using Vector3 = UnityEngine.Vector3;
 
 namespace Managers {
     /// <summary>

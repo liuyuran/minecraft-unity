@@ -3,6 +3,7 @@ using Unity.Mathematics;
 using Unity.Physics;
 using UnityEngine;
 using Entity = Unity.Entities.Entity;
+using Vector3 = UnityEngine.Vector3;
 
 namespace Utils {
     /// <summary>

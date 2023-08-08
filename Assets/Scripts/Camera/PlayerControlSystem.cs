@@ -1,4 +1,3 @@
-using Base.Events;
 using Base.Events.ClientEvent;
 using Base.Manager;
 using Components;
@@ -11,6 +10,7 @@ using Unity.Physics;
 using UnityEngine;
 using Utils;
 using Block = Components.Block;
+using Vector3 = Base.Utils.Vector3;
 
 namespace Camera {
     /// <summary>
@@ -43,7 +43,7 @@ namespace Camera {
         /// <param name="collisionWorld">物理世界</param>
         /// <returns>屏幕中心指向的目标</returns>
         private RaycastUtil.RaycastResult? GetRaycastTarget(PhysicsWorldSingleton collisionWorld) {
-            var center = new Vector3(Screen.width / 2, Screen.height / 2, 1);
+            var center = new UnityEngine.Vector3(Screen.width / 2, Screen.height / 2, 1);
             var pointA = CameraLink.Instance.ScreenToWorldPoint(center);
             center.z = MaxControlDistance;
             var pointB = CameraLink.Instance.ScreenToWorldPoint(center) - pointA;
@@ -63,8 +63,8 @@ namespace Camera {
             var blockPos = entityManager.GetComponentData<Block>(target.Value.Entity).Pos;
             CommandTransferManager.NetworkAdapter?.SendToServer(new BlockUpdateEvent {
                 WorldId = worldId,
-                ChunkPos = new System.Numerics.Vector3(chunkPos.x, chunkPos.y, chunkPos.z),
-                BlockPos = new System.Numerics.Vector3(blockPos.x, blockPos.y, blockPos.z),
+                ChunkPos = new Vector3(chunkPos.x, chunkPos.y, chunkPos.z),
+                BlockPos = new Vector3(blockPos.x, blockPos.y, blockPos.z),
                 ActionType = BlockUpdateEvent.ActionTypeEnum.Dig,
                 Direction = target.Value.Direction
             });
@@ -83,8 +83,8 @@ namespace Camera {
             var blockPos = entityManager.GetComponentData<Block>(target.Value.Entity).Pos;
             CommandTransferManager.NetworkAdapter?.SendToServer(new BlockUpdateEvent {
                 WorldId = worldId,
-                ChunkPos = new System.Numerics.Vector3(chunkPos.x, chunkPos.y, chunkPos.z),
-                BlockPos = new System.Numerics.Vector3(blockPos.x, blockPos.y, blockPos.z),
+                ChunkPos = new Vector3(chunkPos.x, chunkPos.y, chunkPos.z),
+                BlockPos = new Vector3(blockPos.x, blockPos.y, blockPos.z),
                 ActionType = BlockUpdateEvent.ActionTypeEnum.Active,
                 Direction = target.Value.Direction
             });
