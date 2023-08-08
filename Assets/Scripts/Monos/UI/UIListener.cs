@@ -2,7 +2,6 @@
 using Base;
 using Base.Events.ClientEvent;
 using Base.Manager;
-using Const;
 using Managers;
 using UnityEditor;
 using UnityEngine;
@@ -11,14 +10,20 @@ using UnityEngine.UIElements;
 namespace Monos.UI {
     public partial class UIManager {
         private void MainMenuListener(ref TemplateContainer ui) {
+            new Thread(() => { Game.Start(""); }).Start();
+            GameManager.Instance.SetState(Const.GameState.Playing);
+            Thread.Sleep(1000);
+            CommandTransferManager.NetworkAdapter?.SendToServer(new PlayerJoinEvent {
+                Nickname = "Kamoeth"
+            });
             ui.Query<Button>("single-player").First().clicked += () => {
                 // 开始游戏，跳转界面将在Mono脚本的Update回调中完成
                 new Thread(() => { Game.Start(""); }).Start();
+                GameManager.Instance.SetState(Const.GameState.Loading);
                 Thread.Sleep(1000);
                 CommandTransferManager.NetworkAdapter?.SendToServer(new PlayerJoinEvent {
                     Nickname = "Kamoeth"
                 });
-                GameManager.Instance.SetState(Const.GameState.Playing);
             };
             ui.Query<Button>("option").First().clicked += () => {
                 // 选项

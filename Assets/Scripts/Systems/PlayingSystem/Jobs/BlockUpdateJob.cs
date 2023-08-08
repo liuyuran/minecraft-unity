@@ -56,7 +56,7 @@ namespace Systems.PlayingSystem.Jobs {
                 item.BlockId,
                 item.RenderFlags
             ));
-            Ecb.SetComponent(index, e, SubMeshCacheManager.Instance.Collider);
+            // Ecb.SetComponent(index, e, SubMeshCacheManager.Instance.Collider);
         }
     }
 }

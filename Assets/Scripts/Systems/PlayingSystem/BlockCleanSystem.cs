@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using Camera;
 using Components;
 using Managers;
@@ -14,6 +15,7 @@ namespace Systems.PlayingSystem {
     /// </summary>
     [BurstCompile]
     [UpdateInGroup(typeof(GameSystemGroup))]
+    [StructLayout(LayoutKind.Auto)]
     public partial struct BlockCleanSystem : ISystem {
         private EntityQuery _query;
         
