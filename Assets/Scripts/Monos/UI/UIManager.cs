@@ -18,6 +18,7 @@ namespace Monos.UI {
         [SerializeField] public UIDocument uiDocument;
         private GameState? _nowState;
         private readonly IDictionary<string, TemplateContainer> _uxmlLink = new Dictionary<string, TemplateContainer>();
+        private bool actived = false;
         
         private void Awake() {
             _uxmlLink.Clear();
@@ -38,7 +39,8 @@ namespace Monos.UI {
         /// <exception cref="ArgumentOutOfRangeException">当State出现意外值的时候</exception>
         private void UpdateUIDocument() {
             var targetState = GameManager.Instance.State;
-            if (_nowState == targetState || !uiDocument.isActiveAndEnabled) return;
+            if (!actived && uiDocument.isActiveAndEnabled) actived = true;
+            if (_nowState == targetState || !actived) return;
             switch (targetState) {
                 case GameState.Menu:
                     JumpUI("main-menu");

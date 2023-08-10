@@ -1,4 +1,5 @@
 ﻿using Camera;
+using Components;
 using Managers;
 using Systems.SystemGroups;
 using Unity.Burst;
@@ -22,7 +23,7 @@ namespace Systems.PlayingSystem {
         [BurstCompile]
         public void OnCreate(ref SystemState state) {
             _transformQuery = new EntityQueryBuilder(Allocator.Temp)
-                .WithAll<LocalTransform>()
+                .WithAll<LocalTransform, Block>()
                 .Build(state.EntityManager);
             _playerQuery = new EntityQueryBuilder(Allocator.Temp)
                 .WithAll<Player, Self>()

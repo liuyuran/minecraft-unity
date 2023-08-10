@@ -12,7 +12,7 @@ namespace Monos.UI {
         private void MainMenuListener(ref TemplateContainer ui) {
             new Thread(() => { Game.Start(""); }).Start();
             GameManager.Instance.SetState(Const.GameState.Playing);
-            Thread.Sleep(1000);
+            Thread.Sleep(2000);
             CommandTransferManager.NetworkAdapter?.SendToServer(new PlayerJoinEvent {
                 Nickname = "Kamoeth"
             });

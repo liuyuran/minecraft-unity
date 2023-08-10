@@ -49,27 +49,29 @@ namespace Systems.PlayingSystem.Processor {
                 GetItemPrototype(entityManager);
             }
             var generator = SystemAPI.GetSingleton<EntityGenerator>();
+            var flag = false;
             while (Base.Manager.CommandTransferManager.NetworkAdapter?.TryGetFromServer(out var message) ?? false) {
                 if (message == null) return;
                 switch (message) {
                     case ChunkUpdateEvent chunkUpdateEvent:
                         GenerateChunkBlocks(generator, ecb, chunkUpdateEvent);
+                        flag = true;
                         break;
                 }
             }
             
             ecb.Playback(entityManager);
             ecb.Dispose();
-            if (_isInit) return;
+            if (_isInit || !flag) return;
             _isInit = true;
             // 第一次生成地形后，再给角色赋予重力属性
-            var physicsGravityFactor = new Unity.Physics.PhysicsGravityFactor { Value = 1.0f };
-            var player = _playerQuery.GetSingletonEntity();
-            if (entityManager.HasComponent<Unity.Physics.PhysicsGravityFactor>(player))
-                entityManager.SetComponentData(player, physicsGravityFactor);
-            else
-                entityManager.AddComponentData(player, physicsGravityFactor);
-            GameManager.Instance.SetState(Const.GameState.Playing);
+            // var physicsGravityFactor = new Unity.Physics.PhysicsGravityFactor { Value = 1.0f };
+            // var player = _playerQuery.GetSingletonEntity();
+            // if (entityManager.HasComponent<Unity.Physics.PhysicsGravityFactor>(player))
+            //     entityManager.SetComponentData(player, physicsGravityFactor);
+            // else
+            //     entityManager.AddComponentData(player, physicsGravityFactor);
+            // GameManager.Instance.SetState(Const.GameState.Playing);
         }
     }
 }
