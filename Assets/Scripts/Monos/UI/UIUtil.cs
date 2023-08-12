@@ -1,5 +1,6 @@
 ﻿using Exceptions;
 using UnityEditor;
+using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace Monos.UI {
@@ -12,7 +13,7 @@ namespace Monos.UI {
         /// <param name="listener">UI后处理器</param>
         private void RegistryUI(string uiName, string path, UIListenerDelegate listener) {
             if (_uxmlLink.ContainsKey(uiName)) throw new DuplicateUIException(uiName);
-            var uiAsset = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>($"Assets/{path}");
+            var uiAsset = Resources.LoadAll<VisualTreeAsset>($"{path}")[0];
             var ui = uiAsset.CloneTree();
             listener?.Invoke(ref ui);
             _uxmlLink.Add(uiName, ui);

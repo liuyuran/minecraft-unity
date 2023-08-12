@@ -10,12 +10,6 @@ using UnityEngine.UIElements;
 namespace Monos.UI {
     public partial class UIManager {
         private void MainMenuListener(ref TemplateContainer ui) {
-            new Thread(() => { Game.Start(""); }).Start();
-            GameManager.Instance.SetState(Const.GameState.Playing);
-            Thread.Sleep(2000);
-            CommandTransferManager.NetworkAdapter?.SendToServer(new PlayerJoinEvent {
-                Nickname = "Kamoeth"
-            });
             ui.Query<Button>("single-player").First().clicked += () => {
                 // 开始游戏，跳转界面将在Mono脚本的Update回调中完成
                 new Thread(() => { Game.Start(""); }).Start();

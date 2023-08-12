@@ -33,8 +33,8 @@ namespace Camera {
             switch (GameManager.Instance.State) {
                 case GameState.Menu:
                     Cursor.lockState = CursorLockMode.Confined;
-                    Cursor.visible = true; // 隐藏鼠标 
-                    return;
+                    Cursor.visible = true;
+                    break;
                 case GameState.Playing:
                     Cursor.lockState = CursorLockMode.Locked;
                     Cursor.visible = false; // 隐藏鼠标

@@ -52,7 +52,7 @@ namespace Systems.PlayingSystem.Jobs {
                 Data[index].BlockId,
                 Data[index].RenderFlags
             ));
-            // Ecb.SetComponent(index, e, SubMeshCacheManager.Instance.Collider);
+            Ecb.SetComponent(index, e, SubMeshCacheManager.Instance.Collider);
         }
     }
 }

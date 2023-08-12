@@ -22,6 +22,7 @@ namespace Systems.PlayingSystem.Processor {
         
         public void OnCreate(ref SystemState state) {
             state.RequireForUpdate<EntityGenerator>();
+            state.RequireForUpdate<Camera.Self>();
             _blockQuery = new EntityQueryBuilder(Allocator.Temp)
                 .WithAll<Chunk, Block>()
                 .Build(state.EntityManager);
@@ -65,13 +66,13 @@ namespace Systems.PlayingSystem.Processor {
             if (_isInit || !flag) return;
             _isInit = true;
             // 第一次生成地形后，再给角色赋予重力属性
-            // var physicsGravityFactor = new Unity.Physics.PhysicsGravityFactor { Value = 1.0f };
-            // var player = _playerQuery.GetSingletonEntity();
-            // if (entityManager.HasComponent<Unity.Physics.PhysicsGravityFactor>(player))
-            //     entityManager.SetComponentData(player, physicsGravityFactor);
-            // else
-            //     entityManager.AddComponentData(player, physicsGravityFactor);
-            // GameManager.Instance.SetState(Const.GameState.Playing);
+            var physicsGravityFactor = new Unity.Physics.PhysicsGravityFactor { Value = 1.0f };
+            var player = _playerQuery.GetSingletonEntity();
+            if (entityManager.HasComponent<Unity.Physics.PhysicsGravityFactor>(player))
+                entityManager.SetComponentData(player, physicsGravityFactor);
+            else
+                entityManager.AddComponentData(player, physicsGravityFactor);
+            GameManager.Instance.SetState(Const.GameState.Playing);
         }
     }
 }

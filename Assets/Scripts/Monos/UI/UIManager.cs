@@ -18,7 +18,7 @@ namespace Monos.UI {
         [SerializeField] public UIDocument uiDocument;
         private GameState? _nowState;
         private readonly IDictionary<string, TemplateContainer> _uxmlLink = new Dictionary<string, TemplateContainer>();
-        private bool actived = false;
+        private bool _activated = false;
         
         private void Awake() {
             _uxmlLink.Clear();
@@ -26,11 +26,11 @@ namespace Monos.UI {
             ModManager.Instance.ScanAllMod();
             LogManager.Instance.Info("扩展模组扫描完成");
             // TODO 预期通过MODManager动态读取自定义UI
-            RegistryUI("main-menu", "UI/menu/main-menu.uxml", MainMenuListener);
-            RegistryUI("loading", "UI/public/loading.uxml", null);
-            RegistryUI("playing", "UI/in-game/playing.uxml", PlayingListener);
-            RegistryUI("option", "UI/menu/option.uxml", OptionListener);
-            RegistryUI("mods", "UI/menu/mods.uxml", ModsListener);
+            RegistryUI("main-menu", "UI/menu/main-menu", MainMenuListener);
+            RegistryUI("loading", "UI/public/loading", null);
+            RegistryUI("playing", "UI/in-game/playing", PlayingListener);
+            RegistryUI("option", "UI/menu/option", OptionListener);
+            RegistryUI("mods", "UI/menu/mods", ModsListener);
         }
 
         /// <summary>
@@ -39,8 +39,8 @@ namespace Monos.UI {
         /// <exception cref="ArgumentOutOfRangeException">当State出现意外值的时候</exception>
         private void UpdateUIDocument() {
             var targetState = GameManager.Instance.State;
-            if (!actived && uiDocument.isActiveAndEnabled) actived = true;
-            if (_nowState == targetState || !actived) return;
+            if (!_activated && uiDocument.isActiveAndEnabled) _activated = true;
+            if (_nowState == targetState || !_activated) return;
             switch (targetState) {
                 case GameState.Menu:
                     JumpUI("main-menu");

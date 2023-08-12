@@ -507,7 +507,7 @@ PrefabInstance:
     - target: {fileID: 5501349139152353895, guid: f62bdedabeb2eeb49a5d3d93520b585a,
         type: 3}
       propertyPath: m_GravityFactor
-      value: 0.5
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6285055080256139395, guid: f62bdedabeb2eeb49a5d3d93520b585a,
         type: 3}
@@ -522,7 +522,7 @@ PrefabInstance:
     - target: {fileID: 6285055080256139395, guid: f62bdedabeb2eeb49a5d3d93520b585a,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 20.6
+      value: 10.6
       objectReference: {fileID: 0}
     - target: {fileID: 6285055080256139395, guid: f62bdedabeb2eeb49a5d3d93520b585a,
         type: 3}
